@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 public interface StatisticRepos extends CommonRepository<Statistic> {
 
-    @Query(value = "select s from Statistic s where s.moment >= :start and s.moment <= :end")
-    List<Statistic> findAllByRange(@Param("start") Date start, @Param("end") Date end);
+    @Query(value = "select s from Statistic s where s.moment >= :start and s.moment <= :end and s.model.id=:id")
+    List<Statistic> findAllByRange(@Param("start") Date start, @Param("end") Date end, @Param("id") long id);
 }
