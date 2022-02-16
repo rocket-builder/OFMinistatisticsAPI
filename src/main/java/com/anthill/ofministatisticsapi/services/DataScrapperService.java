@@ -23,7 +23,7 @@ public class DataScrapperService {
     private final DefaultHttpClient httpClient = new DefaultHttpClient();
 
     public Statistic getStatistics(String url)
-            throws IOException, URISyntaxException {
+            throws IOException {
 
         var requestUrl = baseUrl + "/ModelStatistics?url=" + url;
         var request = new HttpGet(requestUrl);
