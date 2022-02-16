@@ -9,5 +9,4 @@ class OfMiniStatisticsApiApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
