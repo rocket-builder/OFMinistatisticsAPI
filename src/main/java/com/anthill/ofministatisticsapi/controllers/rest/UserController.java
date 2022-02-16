@@ -8,6 +8,7 @@ import com.anthill.ofministatisticsapi.exceptions.LoginAlreadyTakenException;
 import com.anthill.ofministatisticsapi.exceptions.ResourceAlreadyExists;
 import com.anthill.ofministatisticsapi.exceptions.UserNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
+import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,11 +24,13 @@ import java.util.List;
 @RestController
 public class UserController extends AbstractController<User, UserRepos> {
 
+    private final StatisticRepos statisticRepos;
     private final OnlyFansModelRepos modelRepos;
     private final DataScrapperService scrapperService;
 
-    protected UserController(UserRepos repos, OnlyFansModelRepos modelRepos, DataScrapperService scrapperService) {
+    protected UserController(UserRepos repos, StatisticRepos statisticRepos, OnlyFansModelRepos modelRepos, DataScrapperService scrapperService) {
         super(repos);
+        this.statisticRepos = statisticRepos;
         this.modelRepos = modelRepos;
         this.scrapperService = scrapperService;
     }
@@ -73,10 +76,8 @@ public class UserController extends AbstractController<User, UserRepos> {
 
         var statistics = scrapperService.getStatistics(url);
 
-        var model = new OnlyFansModel();
-        model.setName(statistics.getName());
-        model.setStatistics(List.of(statistics));
-        model.setUser(user.get());
+        var model = new OnlyFansModel(
+                statistics.getName(), url, user.get(), List.of(statistics));
 
         return modelRepos.save(model);
     }

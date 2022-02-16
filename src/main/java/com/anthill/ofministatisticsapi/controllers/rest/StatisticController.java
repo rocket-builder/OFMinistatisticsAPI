@@ -15,4 +15,5 @@ public class StatisticController extends AbstractController<Statistic, Statistic
     protected StatisticController(StatisticRepos repos) {
         super(repos);
     }
+
 }

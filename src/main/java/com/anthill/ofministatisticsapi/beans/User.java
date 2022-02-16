@@ -20,6 +20,6 @@ public class User extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="user")
     private List<OnlyFansModel> models;
 }
