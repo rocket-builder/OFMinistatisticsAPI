@@ -24,15 +24,24 @@ import java.util.List;
 @RestController
 public class UserController extends AbstractController<User, UserRepos> {
 
-    private final StatisticRepos statisticRepos;
     private final OnlyFansModelRepos modelRepos;
     private final DataScrapperService scrapperService;
 
-    protected UserController(UserRepos repos, StatisticRepos statisticRepos, OnlyFansModelRepos modelRepos, DataScrapperService scrapperService) {
+    protected UserController(UserRepos repos, OnlyFansModelRepos modelRepos, DataScrapperService scrapperService) {
         super(repos);
-        this.statisticRepos = statisticRepos;
         this.modelRepos = modelRepos;
         this.scrapperService = scrapperService;
+    }
+
+    @GetMapping("/{login}")
+    public User getUserByLogin(@PathVariable("login") String login) throws UserNotFoundedException {
+        var user = repos.findByLogin(login);
+
+        if (user.isEmpty()){
+            throw new UserNotFoundedException();
+        }
+
+        return user.get();
     }
 
     @PostMapping("/login")
