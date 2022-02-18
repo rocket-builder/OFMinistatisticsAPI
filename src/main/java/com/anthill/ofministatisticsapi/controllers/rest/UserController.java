@@ -33,7 +33,7 @@ public class UserController extends AbstractController<User, UserRepos> {
         this.scrapperService = scrapperService;
     }
 
-    @GetMapping("/{login}")
+    @GetMapping("/login/{login}")
     public User getUserByLogin(@PathVariable("login") String login) throws UserNotFoundedException {
         var user = repos.findByLogin(login);
 
