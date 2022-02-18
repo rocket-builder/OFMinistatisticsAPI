@@ -25,7 +25,7 @@ public class DataUpdaterService {
         this.scrapperService = scrapperService;
     }
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 86400)
     public void updateAllModelsStatistics() {
         log.info("start update all models statistics at "+ LocalDateTime.now());
 
