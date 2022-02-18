@@ -16,6 +16,7 @@ import java.util.List;
 public class User extends AbstractEntity {
 
     private String login, password;
+    private long telegramId;
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
