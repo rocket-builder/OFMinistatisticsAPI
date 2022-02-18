@@ -26,7 +26,7 @@ public class DataUpdaterService {
         this.telegramService = telegramService;
     }
 
-    @Scheduled(fixedDelay = 1800)
+    @Scheduled(fixedDelay = 86000)
     public void updateAllModelsStatistics() {
         log.info("start update all models statistics at "+ LocalDateTime.now());
 
