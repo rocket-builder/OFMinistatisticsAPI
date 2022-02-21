@@ -71,14 +71,14 @@ public class UserController extends AbstractController<User, UserRepos> {
         return repos.save(signUp);
     }
 
-    @PostMapping("/{id}/model")
-    public OnlyFansModel addModel(@PathVariable("id") long id, String url)
-            throws ResourceAlreadyExists, UserNotFoundedException, IOException, URISyntaxException {
+    @PostMapping("/{login}/model")
+    public OnlyFansModel addModel(@PathVariable("login") String login, String url)
+            throws ResourceAlreadyExists, UserNotFoundedException, IOException {
         if(modelRepos.existsByUrl(url)){
             throw new ResourceAlreadyExists();
         }
 
-        var user = repos.findById(id);
+        var user = repos.findByLogin(login);
         if(user.isEmpty()){
             throw new UserNotFoundedException();
         }
