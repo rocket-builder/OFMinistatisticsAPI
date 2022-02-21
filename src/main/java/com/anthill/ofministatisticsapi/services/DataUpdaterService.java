@@ -36,7 +36,10 @@ public class DataUpdaterService {
                 var update = scrapperService.getStatistics(model.getUrl());
                 update.setModel(model);
 
+                var last = statisticRepos.findLastByModel(model.getId());
                 statisticRepos.save(update);
+
+                last.ifPresent(update::subtract);
                 telegramService.sendUpdate(
                         new TelegramUpdateDto(model.getUser().getTelegramId(), update));
 

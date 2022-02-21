@@ -20,25 +20,25 @@ public class DataScrapperService {
     @Value("${ofministatistics.app.url}")
     private String baseUrl;
 
-    private final DefaultHttpClient httpClient = new DefaultHttpClient();
-
     public Statistic getStatistics(String url)
             throws IOException {
 
-        var requestUrl = baseUrl + "/ModelStatistics?url=" + url;
-        var request = new HttpGet(requestUrl);
+        try(var httpClient = new DefaultHttpClient()){
+            var requestUrl = baseUrl + "/ModelStatistics?url=" + url;
+            var request = new HttpGet(requestUrl);
 
-        request.addHeader("accept", "application/json");
+            request.addHeader("accept", "application/json");
 
-        var response = httpClient.execute(request);
+            var response = httpClient.execute(request);
 
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new RuntimeException("Failed : HTTP error code : "
-                    + response.getStatusLine().getStatusCode());
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            var json = EntityUtils.toString(response.getEntity());
+
+            return new ObjectMapper().readValue(json, Statistic.class);
         }
-
-        var json = EntityUtils.toString(response.getEntity());
-
-        return new ObjectMapper().readValue(json, Statistic.class);
     }
 }

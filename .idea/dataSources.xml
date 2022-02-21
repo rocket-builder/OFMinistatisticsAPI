@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="of_mini_statistics_db@master.55dbe640-683d-406a-936a-9dfb0764c1b4.c.dbaas.selcloud.ru" uuid="a0c2e3b3-888d-4e1f-85da-e52859203781">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://master.55dbe640-683d-406a-936a-9dfb0764c1b4.c.dbaas.selcloud.ru:6033/of_mini_statistics_db</jdbc-url>
+    </data-source>
+  </component>
+</project>
