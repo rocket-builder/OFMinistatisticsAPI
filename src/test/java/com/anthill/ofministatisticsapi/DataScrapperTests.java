@@ -16,7 +16,7 @@ public class DataScrapperTests {
 
     @Test
     public void getData_whenAllCorrect_shouldGet()
-            throws IOException, URISyntaxException {
+            throws IOException {
         //Arrange
         var url = "https://onlyfans.com/katie_tasty";
 
