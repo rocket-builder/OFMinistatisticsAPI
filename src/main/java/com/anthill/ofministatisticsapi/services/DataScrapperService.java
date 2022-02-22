@@ -2,17 +2,13 @@ package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 @Service
 public class DataScrapperService {
