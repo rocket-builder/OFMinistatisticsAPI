@@ -24,17 +24,17 @@ public class CurrentStatisticService {
             return new CurrentStatisticDto();
         }
 
-        var today = calculateStatistic(
-                statisticRepos.findTodayByModel(model.getId()));
+        var stats = statisticRepos.findTodayByModel(model.getId());
+        var today = calculateStatistic(stats);
 
-        var yesterday = calculateStatistic(
-                statisticRepos.findYesterdayByModel(model.getId()));
+        stats = statisticRepos.findYesterdayByModel(model.getId());
+        var yesterday = calculateStatistic(stats);
 
-        var week = calculateStatistic(
-                statisticRepos.findLastWeekByModel(model.getId()));
+        stats = statisticRepos.findLastWeekByModel(model.getId());
+        var week = calculateStatistic(stats);
 
-        var month = calculateStatistic(
-                statisticRepos.findLastMonthByModel(model.getId()));
+        stats = statisticRepos.findLastMonthByModel(model.getId());
+        var month = calculateStatistic(stats);
 
         return new CurrentStatisticDto(model.getName(), current.get(), today, yesterday, week, month);
     }
