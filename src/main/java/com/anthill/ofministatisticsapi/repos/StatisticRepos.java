@@ -33,7 +33,7 @@ public interface StatisticRepos extends CommonRepository<Statistic> {
             nativeQuery = true)
     List<Statistic> findLastWeekByModel(long modelId);
 
-    @Query(value = "select * from statistic s where s.model_id=?1 and MONTH(s.moment) = MONTH(NOW()) - 1",
+    @Query(value = "select * from statistic s where s.model_id=?1 and MONTH(s.moment) >= MONTH(NOW()) - 1",
             nativeQuery = true)
     List<Statistic> findLastMonthByModel(long modelId);
 }
