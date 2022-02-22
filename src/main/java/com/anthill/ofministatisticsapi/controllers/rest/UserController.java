@@ -19,6 +19,7 @@ import com.anthill.ofministatisticsapi.security.MD5;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -59,10 +60,18 @@ public class UserController extends AbstractController<User, UserRepos> {
             throw new UserNotFoundedException();
         }
 
-        return user.get().getModels()
-                .stream()
-                .map(currentStatisticService::getByModel)
-                .collect(Collectors.toList());
+        List<CurrentStatisticDto> statisticDtos = new ArrayList<>();
+        user.get().getModels().forEach(model ->
+        {
+            var stats = currentStatisticService.getByModel(model);
+            statisticDtos.add(stats);
+        });
+
+        return statisticDtos;
+//        user.get().getModels()
+//                .stream()
+//                .map(currentStatisticService::getByModel)
+//                .collect(Collectors.toList());
     }
 
     @PostMapping("/login")
