@@ -21,9 +21,13 @@ public interface StatisticRepos extends CommonRepository<Statistic> {
     @Query(value = "select * from statistic s where s.model_id=?1 order by id desc limit 1", nativeQuery = true)
     Optional<Statistic> findLastByModel(long modelId);
 
-    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment >= DATE_SUB(DATE(NOW()), INTERVAL 2 DAY)",
+    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment = CURDATE()",
             nativeQuery = true)
-    List<Statistic> findLastDayByModel(long modelId);
+    List<Statistic> findTodayByModel(long modelId);
+
+    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment >= DATE_SUB(DATE(NOW()), INTERVAL 1 DAY)",
+            nativeQuery = true)
+    List<Statistic> findYesterdayByModel(long modelId);
 
     @Query(value = "select * from statistic s where s.model_id=?1 and s.moment >= DATE_SUB(DATE(NOW()), INTERVAL 7 DAY)",
             nativeQuery = true)

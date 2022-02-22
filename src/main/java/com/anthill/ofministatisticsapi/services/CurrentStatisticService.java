@@ -6,8 +6,6 @@ import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -27,7 +25,10 @@ public class CurrentStatisticService {
         }
 
         var today = calculateStatistic(
-                statisticRepos.findLastDayByModel(model.getId()));
+                statisticRepos.findTodayByModel(model.getId()));
+
+        var yesterday = calculateStatistic(
+                statisticRepos.findYesterdayByModel(model.getId()));
 
         var week = calculateStatistic(
                 statisticRepos.findLastWeekByModel(model.getId()));
@@ -35,8 +36,7 @@ public class CurrentStatisticService {
         var month = calculateStatistic(
                 statisticRepos.findLastMonthByModel(model.getId()));
 
-        //TODO add yesterday
-        return new CurrentStatisticDto(model.getName(), current.get(), today, today, week, month);
+        return new CurrentStatisticDto(model.getName(), current.get(), today, yesterday, week, month);
     }
 
     private Statistic calculateStatistic(List<Statistic> statistics){
