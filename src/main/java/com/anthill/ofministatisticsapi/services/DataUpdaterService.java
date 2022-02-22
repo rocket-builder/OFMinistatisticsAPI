@@ -1,6 +1,5 @@
 package com.anthill.ofministatisticsapi.services;
 
-import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.telegram.TelegramUpdateDto;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
@@ -27,7 +26,7 @@ public class DataUpdaterService {
         this.telegramService = telegramService;
     }
 
-    //@Scheduled(fixedDelay = 86400)
+    @Scheduled(fixedDelay = 86400)
     public void updateAllModelsStatistics() {
         log.info("start update all models statistics at "+ LocalDateTime.now());
 
