@@ -44,8 +44,7 @@ public class CurrentStatisticService {
             var first = statistics.get(0);
             var last = statistics.get(statistics.size()-1);
 
-            last.subtract(first);
-            return last;
+            return Statistic.subtract(last, first);
         } else if (statistics.size() == 1){
 
             return statistics.get(0);

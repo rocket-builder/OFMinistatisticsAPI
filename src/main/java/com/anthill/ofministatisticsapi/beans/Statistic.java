@@ -30,7 +30,20 @@ public class Statistic extends AbstractEntity {
     private Date moment;
 
     public void subtract(Statistic statistic){
-        this.subscribersCount -= statistic.getSubscribersCount();
-        this.likesCount -= statistic.getLikesCount();
+        subscribersCount -= statistic.getSubscribersCount();
+        likesCount -= statistic.getLikesCount();
+    }
+
+    public static Statistic subtract(Statistic s1, Statistic s2){
+        var result = new Statistic();
+        result.setName(s1.getName());
+        result.setModel(s1.getModel());
+
+        result.setSubscribersCount(s1.getSubscribersCount() - s2.getSubscribersCount());
+        result.setLikesCount(s1.getLikesCount() - s2.getLikesCount());
+
+        result.setMoment(s1.getMoment());
+
+        return result;
     }
 }
