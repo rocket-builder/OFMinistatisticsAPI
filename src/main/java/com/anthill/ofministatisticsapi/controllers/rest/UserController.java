@@ -103,10 +103,7 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     @PostMapping("/{login}/model")
     public OnlyFansModel addModel(@PathVariable("login") String login, String url)
-            throws ResourceAlreadyExists, UserNotFoundedException, IOException {
-        if(modelRepos.existsByUrl(url)){
-            throw new ResourceAlreadyExists();
-        }
+            throws UserNotFoundedException, IOException {
 
         var user = repos.findByLogin(login);
         if(user.isEmpty()){
