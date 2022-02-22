@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +20,16 @@ public interface StatisticRepos extends CommonRepository<Statistic> {
 
     @Query(value = "select * from statistic s where s.model_id=?1 order by id desc limit 1", nativeQuery = true)
     Optional<Statistic> findLastByModel(long modelId);
+
+    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment >= DATE_SUB(DATE(NOW()), INTERVAL 2 DAY)",
+            nativeQuery = true)
+    List<Statistic> findLastDayByModel(long modelId);
+
+    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment >= DATE_SUB(DATE(NOW()), INTERVAL 7 DAY)",
+            nativeQuery = true)
+    List<Statistic> findLastWeekByModel(long modelId);
+
+    @Query(value = "select * from statistic s where s.model_id=?1 and MONTH(s.moment) = MONTH(NOW()) - 1",
+            nativeQuery = true)
+    List<Statistic> findLastMonthByModel(long modelId);
 }
