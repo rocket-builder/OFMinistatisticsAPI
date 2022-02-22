@@ -2,6 +2,7 @@ package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.User;
+import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.exceptions.IncorrectPasswordException;
 import com.anthill.ofministatisticsapi.exceptions.LoginAlreadyTakenException;
@@ -10,6 +11,7 @@ import com.anthill.ofministatisticsapi.exceptions.UserNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
+import com.anthill.ofministatisticsapi.services.CurrentStatisticService;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,8 @@ import com.anthill.ofministatisticsapi.security.MD5;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Tag(name = "User")
 @RequestMapping("/user")
@@ -26,11 +30,14 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     private final OnlyFansModelRepos modelRepos;
     private final DataScrapperService scrapperService;
+    private final CurrentStatisticService currentStatisticService;
 
-    protected UserController(UserRepos repos, OnlyFansModelRepos modelRepos, DataScrapperService scrapperService) {
+    protected UserController(UserRepos repos, OnlyFansModelRepos modelRepos,
+                             DataScrapperService scrapperService, CurrentStatisticService currentStatisticService) {
         super(repos);
         this.modelRepos = modelRepos;
         this.scrapperService = scrapperService;
+        this.currentStatisticService = currentStatisticService;
     }
 
     @GetMapping("/login/{login}")
@@ -42,6 +49,20 @@ public class UserController extends AbstractController<User, UserRepos> {
         }
 
         return user.get();
+    }
+
+    @GetMapping("/{login}/statistic")
+    public List<CurrentStatisticDto> getCurrentStatistic(@PathVariable("login") String login) throws UserNotFoundedException {
+        var user = repos.findByLogin(login);
+
+        if (user.isEmpty()){
+            throw new UserNotFoundedException();
+        }
+
+        return user.get().getModels()
+                .stream()
+                .map(currentStatisticService::getByModel)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/login")
@@ -71,14 +92,14 @@ public class UserController extends AbstractController<User, UserRepos> {
         return repos.save(signUp);
     }
 
-    @PostMapping("/{id}/model")
-    public OnlyFansModel addModel(@PathVariable("id") long id, String url)
-            throws ResourceAlreadyExists, UserNotFoundedException, IOException, URISyntaxException {
+    @PostMapping("/{login}/model")
+    public OnlyFansModel addModel(@PathVariable("login") String login, String url)
+            throws ResourceAlreadyExists, UserNotFoundedException, IOException {
         if(modelRepos.existsByUrl(url)){
             throw new ResourceAlreadyExists();
         }
 
-        var user = repos.findById(id);
+        var user = repos.findByLogin(login);
         if(user.isEmpty()){
             throw new UserNotFoundedException();
         }
