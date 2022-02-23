@@ -37,21 +37,22 @@ public class DataUpdaterService {
                 var update = scrapperService.getStatistics(model.getUrl());
                 update.setModel(model);
 
-                var lastOptional = statisticRepos.findLastByModel(model.getId());
+                var todayFirst = statisticRepos.findTodayFirstByModel(model.getId());
 
-                lastOptional.ifPresent(last -> {
-                    var difference = Statistic.subtract(update, last);
+                todayFirst.ifPresentOrElse(today -> {
+                    var difference = Statistic.subtract(update, today);
 
                     if(!difference.isZero()){
-                        statisticRepos.save(update);
                         telegramService.sendUpdate(
                                 new TelegramUpdateDto(model.getUser().getTelegramId(), difference));
 
+                        statisticRepos.save(update);
                         log.info(model.getName() + " statistic successfully updated!");
                     } else {
                         log.info(model.getName() + "statistic has no difference");
                     }
-                });
+                }, () -> statisticRepos.save(update));
+
             } catch (Exception ex){
                 ex.printStackTrace();
             }
