@@ -46,4 +46,8 @@ public class Statistic extends AbstractEntity {
 
         return result;
     }
+
+    public boolean isZero(){
+        return subscribersCount == 0 && likesCount == 0;
+    }
 }
