@@ -1,5 +1,6 @@
 package com.anthill.ofministatisticsapi.services;
 
+import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.telegram.TelegramUpdateDto;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
@@ -26,7 +27,7 @@ public class DataUpdaterService {
         this.telegramService = telegramService;
     }
 
-    @Scheduled(fixedDelay = 86400000)
+    @Scheduled(fixedDelay = 3600000)
     public void updateAllModelsStatistics() {
         log.info("start update all models statistics at "+ LocalDateTime.now());
 
@@ -36,15 +37,21 @@ public class DataUpdaterService {
                 var update = scrapperService.getStatistics(model.getUrl());
                 update.setModel(model);
 
-                statisticRepos.save(update);
+                var lastOptional = statisticRepos.findLastByModel(model.getId());
 
-                var last = statisticRepos.findLastByModel(model.getId());
+                lastOptional.ifPresent(last -> {
+                    var difference = Statistic.subtract(update, last);
 
-                last.ifPresent(update::subtract);
-                telegramService.sendUpdate(
-                        new TelegramUpdateDto(model.getUser().getTelegramId(), update));
+                    if(!difference.isZero()){
+                        statisticRepos.save(update);
+                        telegramService.sendUpdate(
+                                new TelegramUpdateDto(model.getUser().getTelegramId(), difference));
 
-                log.info(model.getName() + " statistic successfully updated!");
+                        log.info(model.getName() + " statistic successfully updated!");
+                    } else {
+                        log.info(model.getName() + "statistic has no difference");
+                    }
+                });
             } catch (Exception ex){
                 ex.printStackTrace();
             }
