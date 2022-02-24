@@ -39,8 +39,14 @@ public class DataUpdaterService {
 
                 var todayFirst = statisticRepos.findTodayFirstByModel(model.getId());
 
-                todayFirst.ifPresentOrElse(today -> {
-                    var difference = Statistic.subtract(update, today);
+                if(todayFirst.isEmpty()){
+                    statisticRepos.save(update);
+                }
+
+                var yesterdayLast = statisticRepos.findYesterdayLastByModel(model.getId());
+
+                yesterdayLast.ifPresent(yesterday -> {
+                    var difference = Statistic.subtract(update, yesterday);
 
                     if(!difference.isZero()){
                         telegramService.sendUpdate(
@@ -51,7 +57,7 @@ public class DataUpdaterService {
                     } else {
                         log.info(model.getName() + "statistic has no difference");
                     }
-                }, () -> statisticRepos.save(update));
+                });
 
             } catch (Exception ex){
                 ex.printStackTrace();
