@@ -29,10 +29,8 @@ public class Statistic extends AbstractEntity {
     private int likesCount;
     private Date moment;
 
-    public void subtract(Statistic statistic){
-        subscribersCount -= statistic.getSubscribersCount();
-        likesCount -= statistic.getLikesCount();
-    }
+    @Column(name = "global")
+    private boolean isGlobalPoint = false;
 
     public static Statistic subtract(Statistic s1, Statistic s2){
         var result = new Statistic();

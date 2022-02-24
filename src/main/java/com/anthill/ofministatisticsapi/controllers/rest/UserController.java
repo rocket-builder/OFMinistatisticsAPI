@@ -6,10 +6,8 @@ import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.exceptions.IncorrectPasswordException;
 import com.anthill.ofministatisticsapi.exceptions.LoginAlreadyTakenException;
-import com.anthill.ofministatisticsapi.exceptions.ResourceAlreadyExists;
 import com.anthill.ofministatisticsapi.exceptions.UserNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
-import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
 import com.anthill.ofministatisticsapi.services.CurrentStatisticService;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
@@ -18,11 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import com.anthill.ofministatisticsapi.security.MD5;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @Tag(name = "User")
 @RequestMapping("/user")
@@ -63,7 +58,7 @@ public class UserController extends AbstractController<User, UserRepos> {
         List<CurrentStatisticDto> statisticDtos = new ArrayList<>();
         user.get().getModels().forEach(model ->
         {
-            var stats = currentStatisticService.getByModel(model);
+            var stats = currentStatisticService.updateByModel(model);
             statisticDtos.add(stats);
         });
 

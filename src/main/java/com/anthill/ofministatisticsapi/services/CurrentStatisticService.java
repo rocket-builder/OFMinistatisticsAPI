@@ -6,40 +6,65 @@ import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
 public class CurrentStatisticService {
 
+    private final DataScrapperService scrapperService;
     private final StatisticRepos statisticRepos;
 
-
-    public CurrentStatisticService(StatisticRepos statisticRepos) {
+    public CurrentStatisticService(DataScrapperService scrapperService, StatisticRepos statisticRepos) {
+        this.scrapperService = scrapperService;
         this.statisticRepos = statisticRepos;
     }
 
-    public CurrentStatisticDto getByModel(OnlyFansModel model){
-        var current = statisticRepos.findLastByModel(model.getId());
-        if(current.isEmpty()){
+    public CurrentStatisticDto updateByModel(OnlyFansModel model){
+        try{
+            var update = scrapperService.getStatistics(model.getUrl());
+
+            update.setModel(model);
+            statisticRepos.save(update);
+
+            var lastGlobalPointOptional =
+                    statisticRepos.findLastGlobalPointByModel(model.getId());
+
+            var today = lastGlobalPointOptional
+                    .map(lastGlobalPoint ->
+                            Statistic.subtract(update, lastGlobalPoint))
+                    .orElseGet(() -> {
+                       var todayFirst = statisticRepos.findTodayFirstByModel(model.getId());
+                       return Statistic.subtract(update, todayFirst.get());
+                    });
+
+            var lastYesterdayGlobalPointOptional =
+                    statisticRepos.findLastYesterdayGlobalPointByModel(model.getId());
+
+            var yesterday = lastYesterdayGlobalPointOptional
+                    .map(lastYesterdayGlobalPoint ->
+                            lastGlobalPointOptional
+                                    .map(lastGlobalPoint ->
+                                            Statistic.subtract(lastGlobalPoint, lastYesterdayGlobalPoint))
+                                    .orElseGet(() ->
+                                            Statistic.subtract(update, lastYesterdayGlobalPoint)))
+                    .orElseGet(Statistic::new);
+
+            var week = subtractLastFromFirst(
+                    statisticRepos.findLastWeekByModel(model.getId()));
+
+            var month = subtractLastFromFirst(
+                    statisticRepos.findLastMonthByModel(model.getId()));
+
+            return new CurrentStatisticDto(model.getName(), update, today, yesterday, week, month);
+        } catch (IOException ex){
+            ex.printStackTrace();
+
             return new CurrentStatisticDto();
         }
-
-        var stats = statisticRepos.findTodayByModel(model.getId());
-        var today = calculateStatistic(stats);
-
-        stats = statisticRepos.findYesterdayByModel(model.getId());
-        var yesterday = calculateStatistic(stats);
-
-        stats = statisticRepos.findLastWeekByModel(model.getId());
-        var week = calculateStatistic(stats);
-
-        stats = statisticRepos.findLastMonthByModel(model.getId());
-        var month = calculateStatistic(stats);
-
-        return new CurrentStatisticDto(model.getName(), current.get(), today, yesterday, week, month);
     }
 
-    private Statistic calculateStatistic(List<Statistic> statistics){
+    private Statistic subtractLastFromFirst(List<Statistic> statistics){
         if (statistics.size() >= 2){
             var first = statistics.get(0);
             var last = statistics.get(statistics.size()-1);

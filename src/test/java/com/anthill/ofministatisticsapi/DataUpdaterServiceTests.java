@@ -16,10 +16,19 @@ public class DataUpdaterServiceTests {
         //Arrange
         updaterService.updateAllModelsStatistics();
 
+        //Act
+
+        //Assert
+    }
+
+    @Test
+    public void saveGlobalPointUpdates_whenAllCorrect_shouldSave(){
+        //Arrange
+        updaterService.updateAllModelsGlobalPoint();
 
         //Act
 
-
         //Assert
+
     }
 }

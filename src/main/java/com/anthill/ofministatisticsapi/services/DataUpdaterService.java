@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -27,6 +28,25 @@ public class DataUpdaterService {
         this.telegramService = telegramService;
     }
 
+    @Scheduled(cron = "0 0 * * * ?")
+    public void updateAllModelsGlobalPoint(){
+        log.info("Start receive 00:00 statistic");
+
+        modelRepos.findAll().forEach(model -> {
+            try{
+                var update = scrapperService.getStatistics(model.getUrl());
+                update.setModel(model);
+                update.setGlobalPoint(true);
+
+                statisticRepos.save(update);
+                log.info("Global point statistic for " + model.getName() + " successfully saved!");
+            } catch (IOException | RuntimeException ex){
+                log.error("Cannot update global statistic for " + model.getName());
+                ex.printStackTrace();
+            }
+        });
+    }
+
     @Scheduled(fixedDelay = 3600000)
     public void updateAllModelsStatistics() {
         log.info("start update all models statistics at "+ LocalDateTime.now());
@@ -37,28 +57,25 @@ public class DataUpdaterService {
                 var update = scrapperService.getStatistics(model.getUrl());
                 update.setModel(model);
 
-                var todayFirst = statisticRepos.findTodayFirstByModel(model.getId());
-
-                if(todayFirst.isEmpty()){
+                var todayFirstOptional = statisticRepos.findTodayFirstByModel(model.getId());
+                if(todayFirstOptional.isEmpty()){
                     statisticRepos.save(update);
                 }
 
-                var yesterdayLast = statisticRepos.findYesterdayLastByModel(model.getId());
+                var lastGlobalPointOptional = statisticRepos.findLastGlobalPointByModel(model.getId());
+                var difference = lastGlobalPointOptional
+                        .map(lastGlobalPoint -> Statistic.subtract(update, lastGlobalPoint))
+                        .orElseGet(() -> Statistic.subtract(update, todayFirstOptional.get()));
 
-                yesterdayLast.ifPresent(yesterday -> {
-                    var difference = Statistic.subtract(update, yesterday);
+                if(!difference.isZero()){
+                    telegramService.sendUpdate(
+                            new TelegramUpdateDto(model.getUser().getTelegramId(), difference));
 
-                    if(!difference.isZero()){
-                        telegramService.sendUpdate(
-                                new TelegramUpdateDto(model.getUser().getTelegramId(), difference));
-
-                        statisticRepos.save(update);
-                        log.info(model.getName() + " statistic successfully updated!");
-                    } else {
-                        log.info(model.getName() + "statistic has no difference");
-                    }
-                });
-
+                    statisticRepos.save(update);
+                    log.info(model.getName() + " statistic successfully updated!");
+                } else {
+                    log.info(model.getName() + "statistic has no difference");
+                }
             } catch (Exception ex){
                 ex.printStackTrace();
             }
