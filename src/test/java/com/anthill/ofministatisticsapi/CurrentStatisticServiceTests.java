@@ -19,7 +19,7 @@ public class CurrentStatisticServiceTests {
         model.setId(648);
 
         //Act
-        var statistic = statisticService.getByModel(model);
+        var statistic = statisticService.updateByModel(model);
 
         //Assert
         assert statistic != null;
