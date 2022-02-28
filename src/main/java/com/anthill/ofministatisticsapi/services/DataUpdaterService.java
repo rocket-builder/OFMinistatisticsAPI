@@ -28,7 +28,7 @@ public class DataUpdaterService {
         this.telegramService = telegramService;
     }
 
-    @Scheduled(cron = "0 0 * * * ?")
+    @Scheduled(cron = "0 0 0 * * *")
     public void updateAllModelsGlobalPoint(){
         log.info("Start receive 00:00 statistic");
 
@@ -57,15 +57,18 @@ public class DataUpdaterService {
                 var update = scrapperService.getStatistics(model.getUrl());
                 update.setModel(model);
 
-                var todayFirstOptional = statisticRepos.findTodayFirstByModel(model.getId());
-                if(todayFirstOptional.isEmpty()){
-                    statisticRepos.save(update);
-                }
-
                 var lastGlobalPointOptional = statisticRepos.findLastGlobalPointByModel(model.getId());
                 var difference = lastGlobalPointOptional
                         .map(lastGlobalPoint -> Statistic.subtract(update, lastGlobalPoint))
-                        .orElseGet(() -> Statistic.subtract(update, todayFirstOptional.get()));
+                        .orElseGet(() -> {
+                            var todayFirstOptional = statisticRepos.findTodayFirstByModel(model.getId());
+                            return todayFirstOptional
+                                    .map(todayFirst -> Statistic.subtract(update, todayFirst))
+                                    .orElseGet(() -> {
+                                        statisticRepos.save(update);
+                                        return new Statistic();
+                                    });
+                        });
 
                 if(!difference.isZero()){
                     telegramService.sendUpdate(
