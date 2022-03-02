@@ -6,6 +6,7 @@ import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.exceptions.IncorrectPasswordException;
 import com.anthill.ofministatisticsapi.exceptions.LoginAlreadyTakenException;
+import com.anthill.ofministatisticsapi.exceptions.ResourceAlreadyExists;
 import com.anthill.ofministatisticsapi.exceptions.UserNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
@@ -98,11 +99,18 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     @PostMapping("/{login}/model")
     public OnlyFansModel addModel(@PathVariable("login") String login, String url)
-            throws UserNotFoundedException, IOException {
+            throws UserNotFoundedException, IOException, ResourceAlreadyExists {
 
         var user = repos.findByLogin(login);
         if(user.isEmpty()){
             throw new UserNotFoundedException();
+        }
+
+        var modelExists = user.get().getModels()
+                .stream()
+                .anyMatch(model -> model.getUrl().equals(url));
+        if(modelExists){
+            throw new ResourceAlreadyExists();
         }
 
         var statistics = scrapperService.getStatistics(url);
