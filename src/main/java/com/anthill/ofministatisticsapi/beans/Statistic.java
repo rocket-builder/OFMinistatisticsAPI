@@ -2,16 +2,16 @@ package com.anthill.ofministatisticsapi.beans;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,6 +27,8 @@ public class Statistic extends AbstractEntity {
     private String name;
     private int subscribersCount;
     private int likesCount;
+
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date moment;
 
     @Column(name = "global")

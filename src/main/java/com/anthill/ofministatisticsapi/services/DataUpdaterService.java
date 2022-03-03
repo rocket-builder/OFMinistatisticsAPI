@@ -1,7 +1,7 @@
 package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.Statistic;
-import com.anthill.ofministatisticsapi.beans.telegram.TelegramUpdateDto;
+import com.anthill.ofministatisticsapi.beans.dto.TelegramUpdateDto;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import lombok.extern.slf4j.Slf4j;

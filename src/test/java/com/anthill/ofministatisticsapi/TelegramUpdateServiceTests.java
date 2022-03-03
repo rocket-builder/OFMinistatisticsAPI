@@ -2,13 +2,14 @@ package com.anthill.ofministatisticsapi;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
-import com.anthill.ofministatisticsapi.beans.telegram.TelegramUpdateDto;
+import com.anthill.ofministatisticsapi.beans.dto.TelegramUpdateDto;
 import com.anthill.ofministatisticsapi.services.TelegramUpdateService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.sql.Date;
+import java.util.Date;
 
 @SpringBootTest
 public class TelegramUpdateServiceTests {
@@ -17,7 +18,7 @@ public class TelegramUpdateServiceTests {
     TelegramUpdateService telegramService;
 
     @Test
-    public void sendUpdate_whenAllCorrect_shouldSend(){
+    public void sendUpdate_whenAllCorrect_shouldSend() {
         //Arrange
         var telegramId = 920818350;
 
@@ -27,7 +28,7 @@ public class TelegramUpdateServiceTests {
 
         var statistics = new Statistic();
         statistics.setLikesCount(-10);
-        statistics.setMoment(new Date(1645193914));
+        statistics.setMoment(new Date());
         statistics.setSubscribersCount(-5);
         statistics.setName("Test model");
         statistics.setModel(model);
