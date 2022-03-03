@@ -1,4 +1,4 @@
-package com.anthill.ofministatisticsapi.beans.telegram;
+package com.anthill.ofministatisticsapi.beans.dto;
 
 import com.anthill.ofministatisticsapi.beans.Statistic;
 import lombok.AllArgsConstructor;
