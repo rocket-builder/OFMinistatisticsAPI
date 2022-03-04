@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -22,6 +23,6 @@ public class OnlyFansModel extends AbstractEntity {
     @JoinColumn(name="user_id", nullable=false)
     private User user;
 
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Statistic> statistics;
+    @OneToMany(mappedBy = "model", cascade = CascadeType.DETACH, orphanRemoval = true)
+    private List<Statistic> statistics = new ArrayList<>();
 }
