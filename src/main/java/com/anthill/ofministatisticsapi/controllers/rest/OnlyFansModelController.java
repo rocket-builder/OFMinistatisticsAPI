@@ -24,7 +24,8 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
     private final StatisticRepos statisticRepos;
     private final DataScrapperService scrapperService;
 
-    protected OnlyFansModelController(OnlyFansModelRepos repos, StatisticRepos statisticRepos, DataScrapperService scrapperService) {
+    protected OnlyFansModelController(OnlyFansModelRepos repos, StatisticRepos statisticRepos,
+                                      DataScrapperService scrapperService) {
         super(repos);
         this.statisticRepos = statisticRepos;
         this.scrapperService = scrapperService;
@@ -32,7 +33,7 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
 
     @GetMapping("/{id}/statistics/now")
     public Statistic getLastStatistics(@PathVariable("id") long id)
-            throws ResourceNotFoundedException, IOException, URISyntaxException {
+            throws ResourceNotFoundedException, IOException {
         var model = repos.findById(id);
 
         if(model.isEmpty()){
