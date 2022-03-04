@@ -6,6 +6,7 @@ import com.anthill.ofministatisticsapi.interfaces.CommonController;
 import com.anthill.ofministatisticsapi.interfaces.CommonRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -41,7 +42,7 @@ public abstract class AbstractController<E extends AbstractEntity, R extends Com
     }
 
     @Override
-    public ResponseEntity<E> findById(@RequestParam long id) throws ResourceNotFoundedException {
+    public ResponseEntity<E> findById(@PathVariable("id") long id) throws ResourceNotFoundedException {
 
         var entity = repos.findById(id);
         if(entity.isPresent()){
@@ -59,7 +60,7 @@ public abstract class AbstractController<E extends AbstractEntity, R extends Com
     }
 
     @Override
-    public ResponseEntity<E> deleteById(@RequestParam long id) throws ResourceNotFoundedException {
+    public ResponseEntity<E> deleteById(@PathVariable("id") long id) throws ResourceNotFoundedException {
         var entity = repos.findById(id);
         if(entity.isPresent()){
             repos.delete(entity.get());
