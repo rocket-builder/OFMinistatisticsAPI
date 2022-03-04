@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter @Setter
 @Entity
-@JsonIgnoreProperties({"user"})
+@JsonIgnoreProperties({"user", "statistics"})
 public class OnlyFansModel extends AbstractEntity {
     private String name;
     private String url;

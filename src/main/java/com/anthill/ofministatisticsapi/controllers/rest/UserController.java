@@ -64,10 +64,6 @@ public class UserController extends AbstractController<User, UserRepos> {
         });
 
         return statisticDtos;
-//        user.get().getModels()
-//                .stream()
-//                .map(currentStatisticService::getByModel)
-//                .collect(Collectors.toList());
     }
 
     @PostMapping("/login")
@@ -119,5 +115,16 @@ public class UserController extends AbstractController<User, UserRepos> {
                 statistics.getName(), url, user.get(), List.of(statistics));
 
         return modelRepos.save(model);
+    }
+
+    @GetMapping("{login}/models")
+    public List<OnlyFansModel> getUserModels(@PathVariable("login") String login) throws UserNotFoundedException {
+
+        var user = repos.findByLogin(login);
+        if(user.isEmpty()){
+            throw new UserNotFoundedException();
+        }
+
+        return user.get().getModels();
     }
 }
