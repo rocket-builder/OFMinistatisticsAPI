@@ -9,11 +9,8 @@ import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.Date;
 import java.util.List;
 
@@ -41,7 +38,7 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
             throw new ResourceNotFoundedException();
         }
 
-        return scrapperService.getStatistics(model.get().getUrl());
+        return scrapperService.getStatistic(model.get().getUrl());
     }
 
     @GetMapping("/{id}/statistics/range")

@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @SpringBootTest
 public class DataScrapperTests {
 
@@ -22,7 +19,7 @@ public class DataScrapperTests {
         var url = "https://onlyfans.com/katie_tasty";
 
         //Act
-        var statistics = scrapperService.getStatistics(url);
+        var statistics = scrapperService.getStatisticsDto(url);
 
         //Assert
         assert statistics.getName().length() > 0;

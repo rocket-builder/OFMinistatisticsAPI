@@ -7,7 +7,6 @@ import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -23,7 +22,7 @@ public class CurrentStatisticService {
 
     public CurrentStatisticDto updateByModel(OnlyFansModel model){
         try{
-            var update = scrapperService.getStatistics(model.getUrl());
+            var update = scrapperService.getStatistic(model.getUrl());
 
             update.setModel(model);
             statisticRepos.save(update);

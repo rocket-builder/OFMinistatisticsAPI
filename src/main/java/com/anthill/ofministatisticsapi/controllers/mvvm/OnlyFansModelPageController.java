@@ -34,7 +34,7 @@ public class OnlyFansModelPageController {
             throw new ResourceNotFoundedException();
         }
         var model = modelOptional.get();
-        var current = scrapperService.getStatistics(modelOptional.get().getUrl());
+        var current = scrapperService.getStatistic(modelOptional.get().getUrl());
         var historical = statisticRepos.findLastGlobalPointsByModel(id, days);
 
         return new OnlyFansModelStatisticDto(model, current, historical);

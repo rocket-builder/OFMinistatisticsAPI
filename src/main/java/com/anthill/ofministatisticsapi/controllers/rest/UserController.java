@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.anthill.ofministatisticsapi.security.MD5;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,10 +105,11 @@ public class UserController extends AbstractController<User, UserRepos> {
             throw new ResourceAlreadyExists();
         }
 
-        var statistics = scrapperService.getStatistics(url);
+        var dto = scrapperService.getModelWithStatistic(url);
 
-        var model = new OnlyFansModel(
-                statistics.getName(), url, user.get(), List.of(statistics));
+        var model = dto.getModel();
+        model.setUser(user.get());
+        model.setStatistics(List.of(dto.getStatistic()));
 
         return modelRepos.save(model);
     }

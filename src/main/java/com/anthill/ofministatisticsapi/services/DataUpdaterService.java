@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -35,11 +34,19 @@ public class DataUpdaterService {
 
         modelRepos.findAll().forEach(model -> {
             try{
-                var update = scrapperService.getStatistics(model.getUrl());
-                update.setModel(model);
-                update.setGlobalPoint(true);
+                var dto = scrapperService.getModelWithStatistic(model.getUrl());
+                var modelUpdate = dto.getModel();
+                var statisticUpdate = dto.getStatistic();
 
-                statisticRepos.save(update);
+                statisticUpdate.setModel(model);
+                statisticUpdate.setGlobalPoint(true);
+
+                statisticRepos.save(statisticUpdate);
+
+                model.setAvatarUrl(modelUpdate.getAvatarUrl());
+                model.setName(modelUpdate.getName());
+                modelRepos.save(model);
+
                 log.info("Global point statistic for " + model.getName() + " successfully saved!");
             } catch (CannotGetStatisticException | RuntimeException ex){
                 log.error("Cannot update global statistic for " + model.getName());
@@ -55,7 +62,7 @@ public class DataUpdaterService {
         var models = modelRepos.findAll();
         models.forEach(model -> {
             try{
-                var update = scrapperService.getStatistics(model.getUrl());
+                var update = scrapperService.getStatistic(model.getUrl());
                 update.setModel(model);
 
                 var lastGlobalPointOptional = statisticRepos.findLastGlobalPointByModel(model.getId());
@@ -73,7 +80,7 @@ public class DataUpdaterService {
 
                 if(!difference.isZero()){
                     telegramService.sendUpdate(
-                            new TelegramUpdateDto(model.getUser().getTelegramId(), difference));
+                            new TelegramUpdateDto(model.getUser().getTelegramId(), model, difference));
 
                     statisticRepos.save(update);
                     log.info(model.getName() + " statistic successfully updated!");
