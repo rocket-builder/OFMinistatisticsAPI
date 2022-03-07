@@ -1,6 +1,7 @@
 package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.Statistic;
+import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -16,8 +17,7 @@ public class DataScrapperService {
     @Value("${ofministatistics.app.url}")
     private String baseUrl;
 
-    public Statistic getStatistics(String url)
-            throws IOException {
+    public Statistic getStatistics(String url) throws CannotGetStatisticException {
 
         try(var httpClient = new DefaultHttpClient()){
             var requestUrl = baseUrl + "/ModelStatistics?url=" + url;
@@ -35,6 +35,10 @@ public class DataScrapperService {
             var json = EntityUtils.toString(response.getEntity());
 
             return new ObjectMapper().readValue(json, Statistic.class);
+        }
+        catch (IOException ex){
+            ex.printStackTrace();
+            throw new CannotGetStatisticException();
         }
     }
 }

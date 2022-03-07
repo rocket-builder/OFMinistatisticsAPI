@@ -1,5 +1,6 @@
 package com.anthill.ofministatisticsapi;
 
+import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class DataScrapperTests {
 
     @Test
     public void getData_whenAllCorrect_shouldGet()
-            throws IOException {
+            throws CannotGetStatisticException {
         //Arrange
         var url = "https://onlyfans.com/katie_tasty";
 

@@ -2,6 +2,7 @@ package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.dto.TelegramUpdateDto;
+import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public class DataUpdaterService {
 
                 statisticRepos.save(update);
                 log.info("Global point statistic for " + model.getName() + " successfully saved!");
-            } catch (IOException | RuntimeException ex){
+            } catch (CannotGetStatisticException | RuntimeException ex){
                 log.error("Cannot update global statistic for " + model.getName());
                 ex.printStackTrace();
             }

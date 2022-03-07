@@ -3,6 +3,7 @@ package com.anthill.ofministatisticsapi.controllers.rest;
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
+import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.exceptions.ResourceNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
@@ -33,7 +34,7 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
 
     @GetMapping("/{id}/statistics/now")
     public Statistic getLastStatistics(@PathVariable("id") long id)
-            throws ResourceNotFoundedException, IOException {
+            throws ResourceNotFoundedException, CannotGetStatisticException {
         var model = repos.findById(id);
 
         if(model.isEmpty()){
