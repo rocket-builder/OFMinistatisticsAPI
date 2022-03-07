@@ -22,20 +22,17 @@ public class TelegramUpdateServiceTests {
         //Arrange
         var telegramId = 920818350;
 
-        var model = new OnlyFansModel();
-        //Vi va
-        model.setId(274);
+        var model = OnlyFansModel.builder()
+                .name("Test")
+                .build();
 
-        var statistics = new Statistic();
-        statistics.setLikesCount(-10);
-        statistics.setMoment(new Date());
-        statistics.setSubscribersCount(-5);
-        statistics.setName("Test model");
-        statistics.setModel(model);
+        var statistics = Statistic.builder()
+                .likesCount(-10)
+                .subscribersCount(-5)
+                .moment(new Date())
+                .build();
 
-        var dto = new TelegramUpdateDto();
-        dto.setTelegramId(telegramId);
-        dto.setStatistic(statistics);
+        var dto = new TelegramUpdateDto(telegramId, model, statistics);
 
         //Act
         telegramService.sendUpdate(dto);

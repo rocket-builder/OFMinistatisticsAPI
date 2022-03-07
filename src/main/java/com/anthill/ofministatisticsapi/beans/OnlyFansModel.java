@@ -1,15 +1,13 @@
 package com.anthill.ofministatisticsapi.beans;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
@@ -18,6 +16,7 @@ import java.util.List;
 public class OnlyFansModel extends AbstractEntity {
     private String name;
     private String url;
+    private String avatarUrl;
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable=false)
