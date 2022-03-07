@@ -19,11 +19,8 @@ public interface StatisticRepos extends CommonRepository<Statistic> {
     @Query(value = "select * from statistic s where s.model_id=?1 order by id desc limit 1", nativeQuery = true)
     Optional<Statistic> findLastByModel(long modelId);
 
-    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment = CURDATE()",
+    @Query(value = "select * from statistic s where s.model_id=?1 and s.global=true order by s.id desc limit 1",
             nativeQuery = true)
-    List<Statistic> findTodayByModel(long modelId);
-
-    @Query(value = "select * from statistic s where s.model_id=?1 and s.global=true order by s.id desc limit 1", nativeQuery = true)
     Optional<Statistic> findLastGlobalPointByModel(long modelId);
 
     @Query(value = "select * from statistic s where s.model_id=?1 and " +
@@ -31,28 +28,14 @@ public interface StatisticRepos extends CommonRepository<Statistic> {
             "order by s.id desc limit 1", nativeQuery = true)
     Optional<Statistic> findLastYesterdayGlobalPointByModel(long modelId);
 
+    @Query(value = "select * from statistic s where s.model_id=?1 and " +
+            "s.global=true and s.moment >= DATE_SUB(DATE(NOW()), INTERVAL ?2 DAY) " +
+            "order by s.id desc", nativeQuery = true)
+    List<Statistic> findLastGlobalPointsByModel(long modelId, int days);
+
     @Query(value = "select * from statistic s where s.model_id=?1 and s.moment = CURDATE() order by id asc limit 1",
             nativeQuery = true)
     Optional<Statistic> findTodayFirstByModel(long modelId);
-
-    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment = DATE_SUB(DATE(NOW()), INTERVAL 1 DAY) " +
-            "order by id desc limit 1",
-            nativeQuery = true)
-    Optional<Statistic> findYesterdayLastByModel(long modelId);
-
-    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment = DATE_SUB(DATE(NOW()), INTERVAL 1 DAY) " +
-            "order by s.id asc limit 1",
-            nativeQuery = true)
-    Optional<Statistic> findYesterdayFirstByModel(long modelId);
-
-    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment = DATE_SUB(DATE(NOW()), INTERVAL 2 DAY) " +
-            "order by s.id desc limit 1",
-            nativeQuery = true)
-    Optional<Statistic> findTwoDaysAgoLastByModel(long modelId);
-
-    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment >= DATE_SUB(DATE(NOW()), INTERVAL 1 DAY)",
-            nativeQuery = true)
-    List<Statistic> findYesterdayByModel(long modelId);
 
     @Query(value = "select * from statistic s where s.model_id=?1 and s.moment >= DATE_SUB(DATE(NOW()), INTERVAL 7 DAY)",
             nativeQuery = true)

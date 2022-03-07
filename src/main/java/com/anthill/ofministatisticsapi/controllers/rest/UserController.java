@@ -4,10 +4,7 @@ import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.User;
 import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
-import com.anthill.ofministatisticsapi.exceptions.IncorrectPasswordException;
-import com.anthill.ofministatisticsapi.exceptions.LoginAlreadyTakenException;
-import com.anthill.ofministatisticsapi.exceptions.ResourceAlreadyExists;
-import com.anthill.ofministatisticsapi.exceptions.UserNotFoundedException;
+import com.anthill.ofministatisticsapi.exceptions.*;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
 import com.anthill.ofministatisticsapi.services.CurrentStatisticService;
@@ -95,7 +92,7 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     @PostMapping("/{login}/model")
     public OnlyFansModel addModel(@PathVariable("login") String login, String url)
-            throws UserNotFoundedException, IOException, ResourceAlreadyExists {
+            throws UserNotFoundedException, ResourceAlreadyExists, CannotGetStatisticException {
 
         var user = repos.findByLogin(login);
         if(user.isEmpty()){

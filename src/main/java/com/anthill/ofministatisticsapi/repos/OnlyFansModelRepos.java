@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface OnlyFansModelRepos extends CommonRepository<OnlyFansModel> {
 
-    boolean existsByUrl(String url);
+    Optional<OnlyFansModel> findByUrl(String url);
 }

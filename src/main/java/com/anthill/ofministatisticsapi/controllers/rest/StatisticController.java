@@ -2,6 +2,7 @@ package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
+import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +23,7 @@ public class StatisticController extends AbstractController<Statistic, Statistic
     }
 
     @GetMapping("/now")
-    public Statistic getStatisticsNow(@RequestParam String url) throws IOException {
+    public Statistic getStatisticsNow(@RequestParam String url) throws CannotGetStatisticException {
 
         return scrapperService.getStatistics(url);
     }

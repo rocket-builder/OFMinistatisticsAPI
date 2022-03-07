@@ -3,6 +3,7 @@ package com.anthill.ofministatisticsapi.services;
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
+import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +58,7 @@ public class CurrentStatisticService {
                     statisticRepos.findLastMonthByModel(model.getId()));
 
             return new CurrentStatisticDto(model.getName(), update, today, yesterday, week, month);
-        } catch (IOException ex){
+        } catch (CannotGetStatisticException ex){
             ex.printStackTrace();
 
             return new CurrentStatisticDto();

@@ -80,4 +80,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("You entered an incorrect login or password. \n" +
                 "Please try again :(", HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(CannotGetStatisticException.class)
+    public ResponseEntity<String> cannotGetStatisticException(CannotGetStatisticException ex){
+
+        return new ResponseEntity<>("Cannot get statistic by provided url, try again :(",
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
