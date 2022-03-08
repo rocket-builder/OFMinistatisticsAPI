@@ -89,6 +89,11 @@ public class UserController extends AbstractController<User, UserRepos> {
         return repos.save(signUp);
     }
 
+    @PostMapping("/signOut")
+    public Object signOut(){
+        return null;
+    }
+
     @PostMapping("/{login}/model")
     public OnlyFansModel addModel(@PathVariable("login") String login, String url)
             throws UserNotFoundedException, ResourceAlreadyExists, CannotGetStatisticException {
