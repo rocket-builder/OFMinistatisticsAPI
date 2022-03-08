@@ -2,6 +2,8 @@ package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
+import com.anthill.ofministatisticsapi.beans.dto.OnlyFansModelSearchDto;
+import com.anthill.ofministatisticsapi.beans.dto.OnlyFansModelStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.exceptions.ResourceNotFoundedException;
@@ -39,6 +41,20 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
         }
 
         return scrapperService.getStatistic(model.get().getUrl());
+    }
+
+    @GetMapping("/search")
+    public OnlyFansModelSearchDto searchModel(@RequestParam String url)
+            throws ResourceNotFoundedException, CannotGetStatisticException {
+        var model = repos.findFirstByUrl(url);
+
+        if(model.isEmpty()){
+            throw new ResourceNotFoundedException();
+        }
+
+        var statistic = scrapperService.getStatistic(model.get().getUrl());
+
+        return new OnlyFansModelSearchDto(model.get(), statistic);
     }
 
     @GetMapping("/{id}/statistics/range")

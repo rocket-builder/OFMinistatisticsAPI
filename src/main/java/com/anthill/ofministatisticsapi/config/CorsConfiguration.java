@@ -13,9 +13,6 @@ public class CorsConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://of-mini-statistic-app-dev.herokuapp.com")
-                .allowCredentials(true)
-                .allowedMethods("POST", "GET", "PUT", "DELETE")
-                .allowedHeaders("*");
+                .allowedOrigins("*");
     }
 }
