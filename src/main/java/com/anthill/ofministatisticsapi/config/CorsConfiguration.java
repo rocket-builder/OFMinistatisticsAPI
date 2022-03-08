@@ -12,10 +12,9 @@ public class CorsConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://myceramic-pro.herokuapp.com", "http://myceramic-app",
-                        "https://myceramic.pro", "https://office.ceramic-pro.com",
-                        "https://test-ceramic.herokuapp.com",
-                        "https://www.ceramic-pro.app", "https://ceramic-pro.app")
+                .allowedOrigins(
+                        "https://of-mini-statistic-app-dev.herokuapp.com",
+                        "http://localhost:3000")
                 .allowCredentials(true)
                 .allowedMethods("POST", "GET", "PUT", "DELETE")
                 .allowedHeaders("*");
