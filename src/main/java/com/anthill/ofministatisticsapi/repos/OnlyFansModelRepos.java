@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface OnlyFansModelRepos extends CommonRepository<OnlyFansModel> {
 
-    Optional<OnlyFansModel> findByUrl(String url);
+    Optional<OnlyFansModel> findFirstByUrl(String url);
 }
