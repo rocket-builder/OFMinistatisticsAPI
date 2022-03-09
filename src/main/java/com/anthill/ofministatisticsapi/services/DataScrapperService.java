@@ -2,7 +2,6 @@ package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
-import com.anthill.ofministatisticsapi.beans.dto.OnlyFansModelStatisticDto;
 import com.anthill.ofministatisticsapi.beans.dto.OnlyFansModelWithStatisticDto;
 import com.anthill.ofministatisticsapi.beans.dto.ScrapperStatisticDto;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 public class DataScrapperService {
