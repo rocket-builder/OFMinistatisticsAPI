@@ -10,7 +10,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepos extends CommonRepository<User> {
 
+    Optional<User> findByTelegramId(long telegramId);
     Optional<User> findByLogin(String login);
 
     boolean existsByLoginOrTelegramId(String login, long telegramId);
+
 }

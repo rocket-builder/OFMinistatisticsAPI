@@ -41,6 +41,13 @@ public class UserController extends AbstractController<User, UserRepos> {
                 .orElseThrow(UserNotFoundedException::new);
     }
 
+    @GetMapping("/telegramId/{telegramId}")
+    public User getUserByLogin(@PathVariable("telegramId") long telegramId) throws UserNotFoundedException {
+
+        return repos.findByTelegramId(telegramId)
+                .orElseThrow(UserNotFoundedException::new);
+    }
+
     @GetMapping("/{login}/statistic")
     public List<CurrentStatisticDto> getCurrentStatistic(@PathVariable("login") String login) throws UserNotFoundedException {
         var user = repos.findByLogin(login)
