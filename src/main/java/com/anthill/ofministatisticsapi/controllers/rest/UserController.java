@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import com.anthill.ofministatisticsapi.security.MD5;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "User")
 @RequestMapping("/user")
@@ -26,7 +26,8 @@ public class UserController extends AbstractController<User, UserRepos> {
     private final CurrentStatisticService currentStatisticService;
 
     protected UserController(UserRepos repos, OnlyFansModelRepos modelRepos,
-                             DataScrapperService scrapperService, CurrentStatisticService currentStatisticService) {
+                             DataScrapperService scrapperService,
+                             CurrentStatisticService currentStatisticService) {
         super(repos);
         this.modelRepos = modelRepos;
         this.scrapperService = scrapperService;
@@ -35,53 +36,40 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     @GetMapping("/login/{login}")
     public User getUserByLogin(@PathVariable("login") String login) throws UserNotFoundedException {
-        var user = repos.findByLogin(login);
 
-        if (user.isEmpty()){
-            throw new UserNotFoundedException();
-        }
-
-        return user.get();
+        return repos.findByLogin(login)
+                .orElseThrow(UserNotFoundedException::new);
     }
 
     @GetMapping("/{login}/statistic")
     public List<CurrentStatisticDto> getCurrentStatistic(@PathVariable("login") String login) throws UserNotFoundedException {
-        var user = repos.findByLogin(login);
+        var user = repos.findByLogin(login)
+                .orElseThrow(UserNotFoundedException::new);
 
-        if (user.isEmpty()){
-            throw new UserNotFoundedException();
-        }
-
-        List<CurrentStatisticDto> statisticDtos = new ArrayList<>();
-        user.get().getModels().forEach(model ->
-        {
-            var stats = currentStatisticService.updateByModel(model);
-            statisticDtos.add(stats);
-        });
-
-        return statisticDtos;
+        return user.getModels().stream()
+                .map(currentStatisticService::updateByModel)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/login")
     public User login(@RequestBody User auth) throws UserNotFoundedException, IncorrectPasswordException {
-        var user = repos.findByLogin(auth.getLogin());
+        var user = repos.findByLogin(auth.getLogin())
+                .orElseThrow(UserNotFoundedException::new);
 
-        if (user.isEmpty()){
-            throw new UserNotFoundedException();
-        }
-        if(!user.get().getPassword().equals(MD5.getHash(auth.getPassword()))){
+        if(!user.getPassword().equals(MD5.getHash(auth.getPassword()))){
             throw new IncorrectPasswordException();
         }
 
-        return user.get();
+        return user;
     }
 
     @PostMapping("/signUp")
-    public User signUp(@RequestBody User signUp) throws LoginAlreadyTakenException {
-        var user = repos.findByLogin(signUp.getLogin());
+    public User signUp(@RequestBody User signUp) throws UserAlreadyExistsException {
+        var isUserExists = repos.existsByLoginOrTelegramId(
+                signUp.getLogin(), signUp.getTelegramId());
 
-        if(user.isPresent()){
-            throw new LoginAlreadyTakenException();
+        if(isUserExists){
+            throw new UserAlreadyExistsException();
         }
         var password = MD5.getHash(signUp.getPassword());
         signUp.setPassword(password);
@@ -97,13 +85,10 @@ public class UserController extends AbstractController<User, UserRepos> {
     @PostMapping("/{login}/model")
     public OnlyFansModel addModel(@PathVariable("login") String login, String url)
             throws UserNotFoundedException, ResourceAlreadyExists, CannotGetStatisticException {
+        var user = repos.findByLogin(login)
+                .orElseThrow(UserNotFoundedException::new);
 
-        var user = repos.findByLogin(login);
-        if(user.isEmpty()){
-            throw new UserNotFoundedException();
-        }
-
-        var modelExists = user.get().getModels()
+        var modelExists = user.getModels()
                 .stream()
                 .anyMatch(model -> model.getUrl().equals(url));
         if(modelExists){
@@ -113,7 +98,7 @@ public class UserController extends AbstractController<User, UserRepos> {
         var dto = scrapperService.getModelWithStatistic(url);
 
         var model = dto.getModel();
-        model.setUser(user.get());
+        model.setUser(user);
         model.setStatistics(List.of(dto.getStatistic()));
 
         return modelRepos.save(model);
@@ -121,12 +106,9 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     @GetMapping("{login}/models")
     public List<OnlyFansModel> getUserModels(@PathVariable("login") String login) throws UserNotFoundedException {
+        var user = repos.findByLogin(login)
+                .orElseThrow(UserNotFoundedException::new);
 
-        var user = repos.findByLogin(login);
-        if(user.isEmpty()){
-            throw new UserNotFoundedException();
-        }
-
-        return user.get().getModels();
+        return user.getModels();
     }
 }

@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface UserRepos extends CommonRepository<User> {
 
     Optional<User> findByLogin(String login);
+
+    boolean existsByLoginOrTelegramId(String login, long telegramId);
 }
