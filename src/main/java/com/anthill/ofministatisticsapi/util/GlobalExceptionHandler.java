@@ -56,10 +56,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Attempt to create already exists resource :(", HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(LoginAlreadyTakenException.class)
-    public ResponseEntity<String> loginAlreadyTakenException(LoginAlreadyTakenException ex){
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<String> userAlreadyExistsException(UserAlreadyExistsException ex){
 
-        return new ResponseEntity<>("Login already taken :(", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Such user already exists :(", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpClientErrorException.Forbidden.class)
