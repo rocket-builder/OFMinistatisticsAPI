@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
-public class OnlyFansModelWithStatisticDto {
+public class OnlyFansModelItemDto {
 
     private OnlyFansModel model;
     private Statistic statistic;
