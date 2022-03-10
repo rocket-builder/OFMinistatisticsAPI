@@ -2,7 +2,7 @@ package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
-import com.anthill.ofministatisticsapi.beans.dto.OnlyFansModelWithStatisticDto;
+import com.anthill.ofministatisticsapi.beans.dto.OnlyFansModelItemDto;
 import com.anthill.ofministatisticsapi.beans.dto.ScrapperStatisticDto;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +25,7 @@ public class DataScrapperService {
         return dtoToStatistic(dto);
     }
 
-    public OnlyFansModelWithStatisticDto getModelWithStatistic(String url) throws CannotGetStatisticException{
+    public OnlyFansModelItemDto getModelWithStatistic(String url) throws CannotGetStatisticException{
         var dto = getStatisticsDto(url);
 
         var statistic = dtoToStatistic(dto);
@@ -36,7 +36,7 @@ public class DataScrapperService {
                 .url(url)
                 .build();
 
-        return OnlyFansModelWithStatisticDto.builder()
+        return OnlyFansModelItemDto.builder()
                 .model(model)
                 .statistic(statistic).build();
     }

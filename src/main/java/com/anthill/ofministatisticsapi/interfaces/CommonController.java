@@ -24,6 +24,8 @@ public interface CommonController<E extends AbstractEntity> {
 
     @DeleteMapping("/{id}")
     ResponseEntity<E> deleteById(@PathVariable("id") long id) throws ResourceNotFoundedException;
+    @DeleteMapping("/list")
+    ResponseEntity<Iterable<E>> deleteList(@RequestBody Iterable<Long> ids);
     @DeleteMapping
     ResponseEntity<E> delete(E entity) throws ResourceNotFoundedException;
 }

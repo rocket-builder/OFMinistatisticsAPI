@@ -60,6 +60,14 @@ public abstract class AbstractController<E extends AbstractEntity, R extends Com
     }
 
     @Override
+    public ResponseEntity<Iterable<E>> deleteList(@RequestBody Iterable<Long> ids) {
+        var entities = repos.findAllById(ids);
+        repos.deleteAll(entities);
+
+        return new ResponseEntity<>(entities, HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<E> deleteById(@PathVariable("id") long id) throws ResourceNotFoundedException {
         var entity = repos.findById(id);
         if(entity.isPresent()){
