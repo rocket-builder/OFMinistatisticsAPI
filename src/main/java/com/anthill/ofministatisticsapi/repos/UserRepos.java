@@ -13,6 +13,5 @@ public interface UserRepos extends CommonRepository<User> {
     Optional<User> findByTelegramId(long telegramId);
     Optional<User> findByLogin(String login);
 
-    boolean existsByLoginOrTelegramId(String login, long telegramId);
-
+    Optional<User> findFirstByLoginOrTelegramId(String login, long telegramId);
 }
