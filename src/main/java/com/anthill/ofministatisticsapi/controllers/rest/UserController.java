@@ -78,10 +78,10 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     @PostMapping("/signUp")
     public User signUp(@RequestBody User signUp) throws UserAlreadyExistsException {
-        var isUserExists = repos.existsByLoginOrTelegramId(
+        var user = repos.findFirstByLoginOrTelegramId(
                 signUp.getLogin(), signUp.getTelegramId());
 
-        if(isUserExists){
+        if(user.isPresent()){
             throw new UserAlreadyExistsException();
         }
         var password = MD5.getHash(signUp.getPassword());
