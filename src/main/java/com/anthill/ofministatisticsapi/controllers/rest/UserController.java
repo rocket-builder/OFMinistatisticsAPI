@@ -113,6 +113,7 @@ public class UserController extends AbstractController<User, UserRepos> {
         var model = dto.getModel();
         model.setUser(user);
         model.setStatistics(List.of(dto.getStatistic()));
+        model.setNeedAlerts(true);
 
         return modelRepos.save(model);
     }
