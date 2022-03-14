@@ -1,6 +1,7 @@
 package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.Statistic;
+import com.anthill.ofministatisticsapi.beans.dto.TelegramMessageDto;
 import com.anthill.ofministatisticsapi.beans.dto.TelegramUpdateDto;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
@@ -94,10 +95,21 @@ public class DataUpdaterService {
             }
             catch (CannotGetStatisticException ex){
                 ex.printStackTrace();
-                telegramService.sendMessage("Cannot get data for model " + model.getName() + " :(");
+
+                var message = TelegramMessageDto.builder()
+                        .message("Cannot get data for model " + model.getName() + " :(")
+                        .telegramId(model.getUser().getTelegramId())
+                        .build();
+                telegramService.sendMessage(message);
             }
             catch (Exception ex){
                 ex.printStackTrace();
+
+                var message = TelegramMessageDto.builder()
+                        .message("Something awful happened while processing the model " + model.getName() + " :(")
+                        .telegramId(model.getUser().getTelegramId())
+                        .build();
+                telegramService.sendMessage(message);
             }
         });
     }
