@@ -2,10 +2,11 @@ package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.dto.TelegramMessageDto;
+import com.anthill.ofministatisticsapi.exceptions.CannotCheckExistsChatException;
 import com.anthill.ofministatisticsapi.exceptions.UserNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
 import com.anthill.ofministatisticsapi.services.MessageGenerator;
-import com.anthill.ofministatisticsapi.services.TelegramUpdateService;
+import com.anthill.ofministatisticsapi.services.TelegramService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +16,10 @@ import org.springframework.web.bind.annotation.*;
 public class TelegramController {
 
     private final UserRepos userRepos;
-    private final TelegramUpdateService telegramService;
+    private final TelegramService telegramService;
     private final MessageGenerator messageGenerator;
 
-    public TelegramController(UserRepos userRepos, TelegramUpdateService telegramService,
+    public TelegramController(UserRepos userRepos, TelegramService telegramService,
                               MessageGenerator messageGenerator) {
         this.userRepos = userRepos;
         this.telegramService = telegramService;
@@ -36,5 +37,12 @@ public class TelegramController {
 
         telegramService.sendMessage(message);
         return message;
+    }
+
+    @GetMapping("/chat/{telegramId}/exists")
+    public boolean isChatExists(@PathVariable("telegramId") long telegramId)
+            throws CannotCheckExistsChatException {
+
+        return telegramService.isChatExists(telegramId);
     }
 }

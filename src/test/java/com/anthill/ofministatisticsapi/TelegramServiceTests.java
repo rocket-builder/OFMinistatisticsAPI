@@ -4,8 +4,8 @@ import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.dto.TelegramMessageDto;
 import com.anthill.ofministatisticsapi.beans.dto.TelegramUpdateDto;
-import com.anthill.ofministatisticsapi.services.TelegramUpdateService;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.anthill.ofministatisticsapi.exceptions.CannotCheckExistsChatException;
+import com.anthill.ofministatisticsapi.services.TelegramService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,10 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Date;
 
 @SpringBootTest
-public class TelegramUpdateServiceTests {
+public class TelegramServiceTests {
 
     @Autowired
-    TelegramUpdateService telegramService;
+    TelegramService telegramService;
 
     @Test
     public void sendUpdate_whenAllCorrect_shouldSend() {
@@ -57,5 +57,17 @@ public class TelegramUpdateServiceTests {
 
         //Assert
         assert true;
+    }
+
+    @Test
+    public void isChatExists_whenAllCorrect_shouldExists() throws CannotCheckExistsChatException {
+        //Arrange
+        var telegramId = 920818350;
+
+        //Act
+        var exists = telegramService.isChatExists(telegramId);
+
+        //Assert
+        assert exists;
     }
 }

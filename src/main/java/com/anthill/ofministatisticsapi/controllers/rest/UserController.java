@@ -1,7 +1,6 @@
 package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
-import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.User;
 import com.anthill.ofministatisticsapi.beans.dto.CredentialsDto;
 import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
@@ -12,12 +11,12 @@ import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
 import com.anthill.ofministatisticsapi.services.CurrentStatisticService;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
+import com.anthill.ofministatisticsapi.services.TelegramService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import com.anthill.ofministatisticsapi.security.MD5;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,14 +26,16 @@ import java.util.stream.Collectors;
 @RestController
 public class UserController extends AbstractController<User, UserRepos> {
 
+    private final TelegramService telegramService;
     private final OnlyFansModelRepos modelRepos;
     private final DataScrapperService scrapperService;
     private final CurrentStatisticService currentStatisticService;
 
-    protected UserController(UserRepos repos, OnlyFansModelRepos modelRepos,
+    protected UserController(UserRepos repos, TelegramService telegramService, OnlyFansModelRepos modelRepos,
                              DataScrapperService scrapperService,
                              CurrentStatisticService currentStatisticService) {
         super(repos);
+        this.telegramService = telegramService;
         this.modelRepos = modelRepos;
         this.scrapperService = scrapperService;
         this.currentStatisticService = currentStatisticService;
@@ -77,13 +78,18 @@ public class UserController extends AbstractController<User, UserRepos> {
     }
 
     @PostMapping("/signUp")
-    public User signUp(@RequestBody User signUp) throws UserAlreadyExistsException {
+    public User signUp(@RequestBody User signUp)
+            throws UserAlreadyExistsException, CannotCheckExistsChatException, TelegramChatNotExists {
         var user = repos.findFirstByLoginOrTelegramId(
                 signUp.getLogin(), signUp.getTelegramId());
 
         if(user.isPresent()){
             throw new UserAlreadyExistsException();
         }
+        if(!telegramService.isChatExists(signUp.getTelegramId())){
+            throw new TelegramChatNotExists();
+        }
+
         var password = MD5.getHash(signUp.getPassword());
         signUp.setPassword(password);
 
@@ -120,10 +126,13 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     @PutMapping("/{id}/credentials")
     public User updateUserCredentials(@PathVariable("id") long id, @RequestBody CredentialsDto credentials)
-            throws UserNotFoundedException {
+            throws UserNotFoundedException, TelegramChatNotExists, CannotCheckExistsChatException {
         var user = repos.findById(id)
                 .orElseThrow(UserNotFoundedException::new);
 
+        if(!telegramService.isChatExists(credentials.getTelegramId())){
+            throw new TelegramChatNotExists();
+        }
         if(credentials.getLogin() != null){
             user.setLogin(credentials.getLogin());
         }
