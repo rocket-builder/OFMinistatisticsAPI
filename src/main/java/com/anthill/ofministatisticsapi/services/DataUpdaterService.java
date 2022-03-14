@@ -79,15 +79,24 @@ public class DataUpdaterService {
                         });
 
                 if(!difference.isZero()){
-                    telegramService.sendUpdate(
-                            new TelegramUpdateDto(model.getUser().getTelegramId(), model, difference));
+                    if(model.isNeedAlerts()){
+                        telegramService.sendUpdate(
+                                new TelegramUpdateDto(model.getUser().getTelegramId(), model, difference));
+                    } else {
+                        log.info("Telegram alerts disabled for model id " + model.getId());
+                    }
 
                     statisticRepos.save(update);
                     log.info(model.getName() + " statistic successfully updated!");
                 } else {
                     log.info(model.getName() + "statistic has no difference");
                 }
-            } catch (Exception ex){
+            }
+            catch (CannotGetStatisticException ex){
+                ex.printStackTrace();
+                telegramService.sendMessage("Cannot get data for model " + model.getName() + " :(");
+            }
+            catch (Exception ex){
                 ex.printStackTrace();
             }
         });
