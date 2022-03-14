@@ -112,5 +112,7 @@ public class DataUpdaterService {
                 telegramService.sendMessage(message);
             }
         });
+        
+        log.info("All models updated");
     }
 }
