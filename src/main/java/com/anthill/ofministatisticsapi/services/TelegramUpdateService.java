@@ -57,7 +57,7 @@ public class TelegramUpdateService {
         }
     }
 
-    public CloseableHttpResponse sendPost(String url, Object object) throws IOException {
+    private CloseableHttpResponse sendPost(String url, Object object) throws IOException {
             var httpClient = new DefaultHttpClient();
 
             var json = new ObjectMapper().writeValueAsString(object);
@@ -65,7 +65,7 @@ public class TelegramUpdateService {
             var request = new HttpPost(url);
 
             request.setEntity(new StringEntity(json));
-            request.setHeader("Content-Type", "application/json");
+            request.setHeader("Content-Type", "application/json; charset=utf-8");
 
             var response = httpClient.execute(request);
             httpClient.close();
