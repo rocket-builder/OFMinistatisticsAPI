@@ -19,10 +19,10 @@ public class DataUpdaterService {
     private final StatisticRepos statisticRepos;
     private final OnlyFansModelRepos modelRepos;
     private final DataScrapperService scrapperService;
-    private final TelegramUpdateService telegramService;
+    private final TelegramService telegramService;
 
     public DataUpdaterService(StatisticRepos statisticRepos, OnlyFansModelRepos modelRepos,
-                              DataScrapperService scrapperService, TelegramUpdateService telegramService) {
+                              DataScrapperService scrapperService, TelegramService telegramService) {
         this.statisticRepos = statisticRepos;
         this.modelRepos = modelRepos;
         this.scrapperService = scrapperService;

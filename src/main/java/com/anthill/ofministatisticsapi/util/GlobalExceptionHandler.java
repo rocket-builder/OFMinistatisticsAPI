@@ -87,4 +87,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Cannot get statistic by provided url, try again :(",
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(CannotCheckExistsChatException.class)
+    public ResponseEntity<String> cannotCheckExistsChatException(CannotCheckExistsChatException ex){
+
+        return new ResponseEntity<>("Cannot check if chat exists :(", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(TelegramChatNotExists.class)
+    public ResponseEntity<String> telegramChatNotExists(TelegramChatNotExists ex){
+
+        return new ResponseEntity<>("Telegram chat with our bot not exists :(", HttpStatus.BAD_REQUEST);
+    }
 }
