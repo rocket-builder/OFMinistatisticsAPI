@@ -63,4 +63,14 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
 
         return statisticRepos.findAllByRange(start, end, id);
     }
+
+    @PutMapping("/{id}/alerts")
+    public OnlyFansModel setModelAlerts(@PathVariable("id") long id, @RequestParam boolean enable)
+            throws ResourceNotFoundedException {
+        var model = repos.findById(id)
+                .orElseThrow(ResourceNotFoundedException::new);
+
+        model.setNeedAlerts(enable);
+        return repos.save(model);
+    }
 }

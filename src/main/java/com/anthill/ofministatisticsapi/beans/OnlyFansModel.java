@@ -17,6 +17,7 @@ public class OnlyFansModel extends AbstractEntity {
     private String name;
     private String url;
     private String avatarUrl;
+    private boolean isNeedAlerts = true;
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable=false)

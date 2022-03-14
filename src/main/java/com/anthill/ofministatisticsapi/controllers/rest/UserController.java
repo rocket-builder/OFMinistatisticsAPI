@@ -95,10 +95,10 @@ public class UserController extends AbstractController<User, UserRepos> {
         return null;
     }
 
-    @PostMapping("/{login}/model")
-    public OnlyFansModel addModel(@PathVariable("login") String login, String url)
+    @PostMapping("/{telegramId}/model")
+    public OnlyFansModel addModel(@PathVariable("telegramId") long telegramId, String url)
             throws UserNotFoundedException, ResourceAlreadyExists, CannotGetStatisticException {
-        var user = repos.findByLogin(login)
+        var user = repos.findByTelegramId(telegramId)
                 .orElseThrow(UserNotFoundedException::new);
 
         var modelExists = user.getModels()
