@@ -54,9 +54,9 @@ public class UserController extends AbstractController<User, UserRepos> {
                 .orElseThrow(UserNotFoundedException::new);
     }
 
-    @GetMapping("/{login}/statistic")
-    public List<CurrentStatisticDto> getCurrentStatistic(@PathVariable("login") String login) throws UserNotFoundedException {
-        var user = repos.findByLogin(login)
+    @GetMapping("/{telegramId}/statistic")
+    public List<CurrentStatisticDto> getCurrentStatistic(@PathVariable("telegramId") long telegramId) throws UserNotFoundedException {
+        var user = repos.findByTelegramId(telegramId)
                 .orElseThrow(UserNotFoundedException::new);
 
         return user.getModels().stream()
@@ -137,9 +137,9 @@ public class UserController extends AbstractController<User, UserRepos> {
         return repos.save(user);
     }
 
-    @GetMapping("{login}/models")
-    public List<OnlyFansModel> getUserModels(@PathVariable("login") String login) throws UserNotFoundedException {
-        var user = repos.findByLogin(login)
+    @GetMapping("/{telegramId}/models")
+    public List<OnlyFansModel> getUserModels(@PathVariable("telegramId") long telegramId) throws UserNotFoundedException {
+        var user = repos.findByTelegramId(telegramId)
                 .orElseThrow(UserNotFoundedException::new);
 
         return user.getModels();
