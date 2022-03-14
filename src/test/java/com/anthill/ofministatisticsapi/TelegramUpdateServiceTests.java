@@ -20,7 +20,7 @@ public class TelegramUpdateServiceTests {
     @Test
     public void sendUpdate_whenAllCorrect_shouldSend() {
         //Arrange
-        var telegramId = 920818350;
+        var telegramId = 713392247;//920818350;
 
         var model = OnlyFansModel.builder()
                 .name("Test")

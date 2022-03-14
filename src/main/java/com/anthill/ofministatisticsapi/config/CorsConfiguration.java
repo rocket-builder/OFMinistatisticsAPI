@@ -14,6 +14,7 @@ public class CorsConfiguration implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                         "https://of-mini-statistic-app-dev.herokuapp.com",
+                        "https://of-mini-statistic-react-app.herokuapp.com",
                         "http://localhost:3000")
                 .allowCredentials(true)
                 .allowedMethods("POST", "GET", "PUT", "DELETE")
