@@ -32,10 +32,11 @@ public class TelegramUpdateService {
             if (response.getStatusLine().getStatusCode() == 200){
                 log.info("Successful send telegram update to id " + update.getTelegramId());
             } else {
+                log.info("Cannot send telegram update to id " + update.getTelegramId() + " :(");
                 log.info(response.getStatusLine().getReasonPhrase());
             }
         } catch (Exception ex){
-            log.info("Cannot send telegram update to id" + update.getTelegramId() + " :(");
+            log.info("Cannot send telegram update to id " + update.getTelegramId() + " :(");
             log.error(ex.getMessage());
         }
     }
