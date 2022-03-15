@@ -2,8 +2,9 @@ package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
-import com.anthill.ofministatisticsapi.beans.dto.OnlyFansModelItemDto;
+import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelItemDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
+import com.anthill.ofministatisticsapi.enums.DateUnit;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.exceptions.ResourceNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
@@ -14,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "OnlyFansModel")
@@ -43,6 +45,7 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
         return scrapperService.getStatistic(model.get().getUrl());
     }
 
+    //TODO search with filter and get oldest model statistic
     @GetMapping("/search")
     public OnlyFansModelItemDto searchModel(@RequestParam String url)
             throws CannotGetStatisticException {
@@ -50,18 +53,25 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
         return scrapperService.getModelWithStatistic(url);
     }
 
-    @GetMapping("/{id}/statistics/range")
+    @GetMapping("/{id}/statistics/filter")
     public List<Statistic> getStatisticsRange(@PathVariable("id") long id,
-                                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date end)
+                                              @RequestParam(defaultValue = "MONTH") DateUnit unit,
+                                              @RequestParam(defaultValue = "6") int count)
             throws ResourceNotFoundedException {
-        var model = repos.findById(id);
+        var model = repos.findById(id)
+                .orElseThrow(ResourceNotFoundedException::new);
 
-        if(model.isEmpty()){
-            throw new ResourceNotFoundedException();
+        List<Statistic> statistics = new ArrayList<>();
+        switch (unit){
+            case MONTH:
+                statistics = statisticRepos.findLastGlobalPointsByModelAndMonthCount(model.getId(), count);
+                break;
+            case DAY:
+                statistics = statisticRepos.findLastGlobalPointsByModelAndDaysCount(model.getId(), count);
+                break;
         }
 
-        return statisticRepos.findAllByRange(start, end, id);
+        return statistics;
     }
 
     @PutMapping("/{id}/alerts")

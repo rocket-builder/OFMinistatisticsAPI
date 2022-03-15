@@ -2,7 +2,7 @@ package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
-import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
+import com.anthill.ofministatisticsapi.beans.dto.statistic.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import org.springframework.stereotype.Service;
