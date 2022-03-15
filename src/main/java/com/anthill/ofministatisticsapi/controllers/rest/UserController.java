@@ -1,10 +1,9 @@
 package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
+import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.User;
-import com.anthill.ofministatisticsapi.beans.dto.CredentialsDto;
-import com.anthill.ofministatisticsapi.beans.dto.CurrentStatisticDto;
-import com.anthill.ofministatisticsapi.beans.dto.OnlyFansModelStatisticDto;
+import com.anthill.ofministatisticsapi.beans.dto.*;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.exceptions.*;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
@@ -13,6 +12,7 @@ import com.anthill.ofministatisticsapi.services.CurrentStatisticService;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
 import com.anthill.ofministatisticsapi.services.TelegramService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import one.util.streamex.StreamEx;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import com.anthill.ofministatisticsapi.security.MD5;
@@ -156,22 +156,33 @@ public class UserController extends AbstractController<User, UserRepos> {
     }
 
     @GetMapping("/{id}/modelsStatistic")
-    public List<OnlyFansModelStatisticDto> getModelsStatistic(@PathVariable("id") long id,
-                                                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start)
+    public List<OnlyFansModelCalculatedStatisticDto> getModelsStatistic(@PathVariable("id") long id,
+                                                                        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start)
             throws UserNotFoundedException {
         var user = repos.findById(id)
                 .orElseThrow(UserNotFoundedException::new);
 
         return user.getModels().stream().map(model -> {
-            var statistic = model.getStatistics().stream()
-                    .filter(s -> s.getMoment().after(start))
-                    .collect(Collectors.toList());
-            var last = statistic.size() > 0? statistic.get(statistic.size() - 1) : null;
+            var statistic = model.getStatistics();
 
-            return OnlyFansModelStatisticDto.builder()
+            var historical = statistic.stream()
+                    .filter(s -> s.getMoment().after(start) && s.isGlobalPoint())
+                    .collect(Collectors.toList());
+
+            var calculated = StreamEx.of(historical)
+                    .pairMap((p, n) ->
+                            CalculatedStatisticDto.builder()
+                                    .calculated(Statistic.subtract(n, p))
+                                    .statistic(n)
+                                    .build())
+                    .collect(Collectors.toList());
+
+            var current = statistic.size() > 0? statistic.get(statistic.size() - 1) : null;
+
+            return OnlyFansModelCalculatedStatisticDto.builder()
                     .model(model)
-                    .historical(statistic)
-                    .current(last)
+                    .historicalCalculated(calculated)
+                    .current(current)
                     .build();
         }).collect(Collectors.toList());
     }

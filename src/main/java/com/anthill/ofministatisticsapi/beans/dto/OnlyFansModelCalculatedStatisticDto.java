@@ -14,5 +14,5 @@ public class OnlyFansModelCalculatedStatisticDto {
 
     private OnlyFansModel model;
     private Statistic current;
-    private List<CalculatedStatisticDto> historical;
+    private List<CalculatedStatisticDto> historicalCalculated;
 }
