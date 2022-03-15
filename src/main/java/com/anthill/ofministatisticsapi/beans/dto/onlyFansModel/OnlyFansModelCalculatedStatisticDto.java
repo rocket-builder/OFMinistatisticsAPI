@@ -1,7 +1,8 @@
-package com.anthill.ofministatisticsapi.beans.dto;
+package com.anthill.ofministatisticsapi.beans.dto.onlyFansModel;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
+import com.anthill.ofministatisticsapi.beans.dto.statistic.CalculatedStatisticDto;
 import lombok.*;
 
 import java.util.List;
@@ -10,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
-public class OnlyFansModelStatisticDto {
+public class OnlyFansModelCalculatedStatisticDto {
 
     private OnlyFansModel model;
     private Statistic current;
-    private List<Statistic> historical;
+    private List<CalculatedStatisticDto> historicalCalculated;
 }

@@ -1,4 +1,4 @@
-package com.anthill.ofministatisticsapi.beans.dto;
+package com.anthill.ofministatisticsapi.beans.dto.statistic;
 
 import com.anthill.ofministatisticsapi.beans.Statistic;
 import lombok.*;

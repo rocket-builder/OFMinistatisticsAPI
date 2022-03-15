@@ -1,4 +1,4 @@
-package com.anthill.ofministatisticsapi.beans.dto;
+package com.anthill.ofministatisticsapi.beans.dto.statistic;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;

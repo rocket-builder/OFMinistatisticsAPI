@@ -1,4 +1,4 @@
-package com.anthill.ofministatisticsapi.beans.dto;
+package com.anthill.ofministatisticsapi.beans.dto.statistic;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
