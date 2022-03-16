@@ -2,11 +2,14 @@ package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
+import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelGraphicDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CurrentStatisticDto;
+import com.anthill.ofministatisticsapi.enums.DateUnit;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,6 +21,33 @@ public class CurrentStatisticService {
     public CurrentStatisticService(DataScrapperService scrapperService, StatisticRepos statisticRepos) {
         this.scrapperService = scrapperService;
         this.statisticRepos = statisticRepos;
+    }
+
+    public List<Statistic> getGraphicData(OnlyFansModel model, DateUnit unit, int count){
+        List<Statistic> graphic = new ArrayList<>();
+        switch (unit){
+            case MONTH:
+                graphic = statisticRepos.findLastGlobalPointsByModelAndMonthCount(model.getId(), count);
+                break;
+            case DAY:
+                graphic = statisticRepos.findLastGlobalPointsByModelAndDaysCount(model.getId(), count);
+                break;
+        }
+
+        return graphic;
+    }
+
+    public OnlyFansModelGraphicDto getWithGraphic(OnlyFansModel model, DateUnit unit, int count)
+            throws CannotGetStatisticException {
+        var current = scrapperService.getStatistic(model.getUrl());
+
+        var graphic = getGraphicData(model, unit, count);
+
+        return OnlyFansModelGraphicDto.builder()
+                .model(model)
+                .current(current)
+                .graphical(graphic)
+                .build();
     }
 
     public CurrentStatisticDto updateByModel(OnlyFansModel model){

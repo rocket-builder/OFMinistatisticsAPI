@@ -10,9 +10,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
-public class OnlyFansModelStatisticDto {
+public class OnlyFansModelGraphicDto {
 
     private OnlyFansModel model;
     private Statistic current;
-    private List<Statistic> historical;
+    private List<Statistic> graphical;
 }
