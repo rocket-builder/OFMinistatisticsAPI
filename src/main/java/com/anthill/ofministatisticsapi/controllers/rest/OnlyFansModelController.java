@@ -2,6 +2,7 @@ package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
+import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelGraphicDto;
 import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelItemDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.enums.DateUnit;
@@ -9,6 +10,7 @@ import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.exceptions.ResourceNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
+import com.anthill.ofministatisticsapi.services.CurrentStatisticService;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,34 +25,22 @@ import java.util.List;
 @RestController
 public class OnlyFansModelController extends AbstractController<OnlyFansModel, OnlyFansModelRepos> {
 
-    private final StatisticRepos statisticRepos;
-    private final DataScrapperService scrapperService;
+    private final CurrentStatisticService statisticService;
 
-    protected OnlyFansModelController(OnlyFansModelRepos repos, StatisticRepos statisticRepos,
-                                      DataScrapperService scrapperService) {
+    protected OnlyFansModelController(OnlyFansModelRepos repos, CurrentStatisticService statisticService) {
         super(repos);
-        this.statisticRepos = statisticRepos;
-        this.scrapperService = scrapperService;
+        this.statisticService = statisticService;
     }
 
-    @GetMapping("/{id}/statistics/now")
-    public Statistic getLastStatistics(@PathVariable("id") long id)
-            throws ResourceNotFoundedException, CannotGetStatisticException {
-        var model = repos.findById(id);
+    @GetMapping("/search/filter")
+    public OnlyFansModelGraphicDto searchModel(@RequestParam String url,
+                                               @RequestParam(defaultValue = "MONTH") DateUnit unit,
+                                               @RequestParam(defaultValue = "6") int count)
+            throws CannotGetStatisticException, ResourceNotFoundedException {
+        var model = repos.findOldestByUrl(url)
+                .orElseThrow(ResourceNotFoundedException::new);
 
-        if(model.isEmpty()){
-            throw new ResourceNotFoundedException();
-        }
-
-        return scrapperService.getStatistic(model.get().getUrl());
-    }
-
-    //TODO search with filter and get oldest model statistic
-    @GetMapping("/search")
-    public OnlyFansModelItemDto searchModel(@RequestParam String url)
-            throws CannotGetStatisticException {
-
-        return scrapperService.getModelWithStatistic(url);
+        return statisticService.getWithGraphic(model, unit, count);
     }
 
     @GetMapping("/{id}/statistics/filter")
@@ -61,17 +51,7 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
         var model = repos.findById(id)
                 .orElseThrow(ResourceNotFoundedException::new);
 
-        List<Statistic> statistics = new ArrayList<>();
-        switch (unit){
-            case MONTH:
-                statistics = statisticRepos.findLastGlobalPointsByModelAndMonthCount(model.getId(), count);
-                break;
-            case DAY:
-                statistics = statisticRepos.findLastGlobalPointsByModelAndDaysCount(model.getId(), count);
-                break;
-        }
-
-        return statistics;
+        return statisticService.getGraphicData(model, unit, count);
     }
 
     @PutMapping("/{id}/alerts")

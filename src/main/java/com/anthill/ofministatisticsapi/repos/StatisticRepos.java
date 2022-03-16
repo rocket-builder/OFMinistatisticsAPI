@@ -16,11 +16,6 @@ import java.util.Optional;
 @Repository
 public interface StatisticRepos extends CommonRepository<Statistic> {
 
-//    @Query(value = "select * from statistic s left join only_fans_model m on s.model_id=m.id where m.url=?1 and " +
-//            "s.global=true and s.moment = DATE_SUB(DATE(NOW()), INTERVAL ?2 DAY) " +
-//            "group by m.url order by s.id desc", nativeQuery = true)
-//    List<Statistic> findGraphicPointsByModelUrlAndDays(String url, int days);
-
     @Query(value = "select * from statistic s where s.model_id=?1 order by id desc limit 1", nativeQuery = true)
     Optional<Statistic> findLastByModel(long modelId);
 
