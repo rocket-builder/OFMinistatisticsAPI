@@ -2,6 +2,7 @@ package com.anthill.ofministatisticsapi.beans.dto.onlyFansModel;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
+import com.anthill.ofministatisticsapi.beans.dto.statistic.CalculatedStatisticDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -18,5 +19,5 @@ public class OnlyFansModelGraphicDto {
     @JsonProperty("statistic")
     private Statistic current;
 
-    private List<Statistic> graphical;
+    private List<CalculatedStatisticDto> graphical;
 }

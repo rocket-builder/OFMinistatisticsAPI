@@ -1,22 +1,18 @@
 package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
-import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelGraphicDto;
-import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelItemDto;
+import com.anthill.ofministatisticsapi.beans.dto.statistic.CalculatedStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.enums.DateUnit;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.exceptions.ResourceNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
-import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import com.anthill.ofministatisticsapi.services.CurrentStatisticService;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +21,12 @@ import java.util.List;
 @RestController
 public class OnlyFansModelController extends AbstractController<OnlyFansModel, OnlyFansModelRepos> {
 
+    private final DataScrapperService scrapperService;
     private final CurrentStatisticService statisticService;
 
-    protected OnlyFansModelController(OnlyFansModelRepos repos, CurrentStatisticService statisticService) {
+    protected OnlyFansModelController(OnlyFansModelRepos repos, DataScrapperService scrapperService, CurrentStatisticService statisticService) {
         super(repos);
+        this.scrapperService = scrapperService;
         this.statisticService = statisticService;
     }
 
@@ -36,31 +34,32 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
     public OnlyFansModelGraphicDto searchModel(@RequestParam String url,
                                                @RequestParam(defaultValue = "MONTH") DateUnit unit,
                                                @RequestParam(defaultValue = "6") int count)
-            throws CannotGetStatisticException, ResourceNotFoundedException {
-        var model = repos.findOldestByUrl(url)
-                .orElseThrow(ResourceNotFoundedException::new);
+            throws CannotGetStatisticException {
+        var modelOptional = repos.findOldestByUrl(url);
 
-        return statisticService.getWithGraphic(model, unit, count);
+        OnlyFansModelGraphicDto dto;
+        if (modelOptional.isPresent()){
+            dto = statisticService.getWithCalculatedGraphic(modelOptional.get(), unit, count);
+        } else {
+            var modelWithStatistic = scrapperService.getModelWithStatistic(url);
+            dto = OnlyFansModelGraphicDto.builder()
+                    .model(modelWithStatistic.getModel())
+                    .current(modelWithStatistic.getStatistic())
+                    .graphical(new ArrayList<>())
+                    .build();
+        }
+
+        return dto;
     }
 
     @GetMapping("/{id}/statistics/filter")
-    public List<Statistic> getStatisticsRange(@PathVariable("id") long id,
-                                              @RequestParam(defaultValue = "MONTH") DateUnit unit,
-                                              @RequestParam(defaultValue = "6") int count)
+    public List<CalculatedStatisticDto> getStatisticsRange(@PathVariable("id") long id,
+                                                           @RequestParam(defaultValue = "MONTH") DateUnit unit,
+                                                           @RequestParam(defaultValue = "6") int count)
             throws ResourceNotFoundedException {
         var model = repos.findById(id)
                 .orElseThrow(ResourceNotFoundedException::new);
 
-        return statisticService.getGraphicData(model, unit, count);
-    }
-
-    @PutMapping("/{id}/alerts")
-    public OnlyFansModel setModelAlerts(@PathVariable("id") long id, @RequestParam boolean enable)
-            throws ResourceNotFoundedException {
-        var model = repos.findById(id)
-                .orElseThrow(ResourceNotFoundedException::new);
-
-        model.setNeedAlerts(enable);
-        return repos.save(model);
+        return statisticService.getCalculatedGraphicData(model, unit, count);
     }
 }

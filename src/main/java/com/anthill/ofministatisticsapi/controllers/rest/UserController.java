@@ -1,24 +1,24 @@
 package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
-import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.User;
 import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelCalculatedStatisticDto;
-import com.anthill.ofministatisticsapi.beans.dto.statistic.CalculatedStatisticDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CredentialsDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.exceptions.*;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
+import com.anthill.ofministatisticsapi.repos.UserOnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
+import com.anthill.ofministatisticsapi.security.MD5;
 import com.anthill.ofministatisticsapi.services.CurrentStatisticService;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
 import com.anthill.ofministatisticsapi.services.TelegramService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import one.util.streamex.StreamEx;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.anthill.ofministatisticsapi.security.MD5;
 
 import java.util.Date;
 import java.util.List;
@@ -30,18 +30,23 @@ import java.util.stream.Collectors;
 public class UserController extends AbstractController<User, UserRepos> {
 
     private final TelegramService telegramService;
-    private final OnlyFansModelRepos modelRepos;
     private final DataScrapperService scrapperService;
     private final CurrentStatisticService currentStatisticService;
 
-    protected UserController(UserRepos repos, TelegramService telegramService, OnlyFansModelRepos modelRepos,
+    private final OnlyFansModelRepos modelRepos;
+    private final UserOnlyFansModelRepos userOnlyFansModelRepos;
+
+    protected UserController(UserRepos repos, TelegramService telegramService,
+                             OnlyFansModelRepos modelRepos,
                              DataScrapperService scrapperService,
-                             CurrentStatisticService currentStatisticService) {
+                             CurrentStatisticService currentStatisticService,
+                             UserOnlyFansModelRepos userOnlyFansModelRepos) {
         super(repos);
         this.telegramService = telegramService;
         this.modelRepos = modelRepos;
         this.scrapperService = scrapperService;
         this.currentStatisticService = currentStatisticService;
+        this.userOnlyFansModelRepos = userOnlyFansModelRepos;
     }
 
     @GetMapping("/login/{login}")
@@ -105,26 +110,33 @@ public class UserController extends AbstractController<User, UserRepos> {
     }
 
     @PostMapping("/{telegramId}/model")
-    public OnlyFansModel addModel(@PathVariable("telegramId") long telegramId, String url)
-            throws UserNotFoundedException, ResourceAlreadyExists, CannotGetStatisticException {
+    public OnlyFansModel addModelOnUser(@PathVariable("telegramId") long telegramId, String url)
+            throws UserNotFoundedException, CannotGetStatisticException, ResourceAlreadyExists {
         var user = repos.findByTelegramId(telegramId)
                 .orElseThrow(UserNotFoundedException::new);
 
-        var modelExists = user.getModels()
-                .stream()
-                .anyMatch(model -> model.getUrl().equals(url));
-        if(modelExists){
-            throw new ResourceAlreadyExists();
+        var modelOptional = modelRepos.findOldestByUrl(url);
+
+        OnlyFansModel model;
+        if(modelOptional.isPresent()){
+            var existModel = modelOptional.get();
+            if(existModel.getUsers().contains(user)){
+                throw new ResourceAlreadyExists();
+            }
+
+            existModel.addUser(user);
+            model = modelRepos.save(existModel);
+        } else {
+            var dto = scrapperService.getModelWithStatistic(url);
+
+            var newModel = dto.getModel();
+            newModel.addUser(user);
+            newModel.setStatistics(List.of(dto.getStatistic()));
+
+            model = modelRepos.save(newModel);
         }
 
-        var dto = scrapperService.getModelWithStatistic(url);
-
-        var model = dto.getModel();
-        model.setUser(user);
-        model.setStatistics(List.of(dto.getStatistic()));
-        model.setNeedAlerts(true);
-
-        return modelRepos.save(model);
+        return model;
     }
 
     @PutMapping("/{id}/credentials")
@@ -165,28 +177,29 @@ public class UserController extends AbstractController<User, UserRepos> {
         var user = repos.findById(id)
                 .orElseThrow(UserNotFoundedException::new);
 
-        return user.getModels().stream().map(model -> {
-            var statistic = model.getStatistics();
+        return user.getModels().stream()
+                .map(model ->
+                        currentStatisticService.getCurrentWithCalculated(model, start))
+                .collect(Collectors.toList());
+    }
 
-            var historical = statistic.stream()
-                    .filter(s -> s.getMoment().after(start) && s.isGlobalPoint())
-                    .collect(Collectors.toList());
+    @PutMapping("/{telegramId}/model/{modelId}/alerts")
+    public OnlyFansModel setModelAlerts(@PathVariable("telegramId") long telegramId,
+                                        @PathVariable("modelId") long modelId,
+                                        @RequestParam boolean enable)
+            throws ResourceNotFoundedException {
 
-            var calculated = StreamEx.of(historical)
-                    .pairMap((p, n) ->
-                            CalculatedStatisticDto.builder()
-                                    .calculated(Statistic.subtract(n, p))
-                                    .statistic(n)
-                                    .build())
-                    .collect(Collectors.toList());
+        var assoc = userOnlyFansModelRepos.findFirstByModel_IdAndUser_TelegramId(modelId, telegramId)
+                .orElseThrow(ResourceNotFoundedException::new);
+        assoc.setNeedAlerts(enable);
 
-            var current = statistic.size() > 0? statistic.get(statistic.size() - 1) : null;
+        return userOnlyFansModelRepos.save(assoc).getModel();
+    }
 
-            return OnlyFansModelCalculatedStatisticDto.builder()
-                    .model(model)
-                    .historicalCalculated(calculated)
-                    .current(current)
-                    .build();
-        }).collect(Collectors.toList());
+    @DeleteMapping("/{userId}/model/{modelId}")
+    public ResponseEntity<String> deleteModelFromUser(@PathVariable("userId") long userId, @PathVariable("modelId") long modelId){
+        userOnlyFansModelRepos.deleteByModel_IdAndUser_Id(modelId, userId);
+
+        return new ResponseEntity<>("Successfully deleted!", HttpStatus.OK);
     }
 }

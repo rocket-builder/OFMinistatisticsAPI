@@ -2,7 +2,9 @@ package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
+import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelCalculatedStatisticDto;
 import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelGraphicDto;
+import com.anthill.ofministatisticsapi.beans.dto.statistic.CalculatedStatisticDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.enums.DateUnit;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
@@ -10,20 +12,43 @@ import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CurrentStatisticService {
 
+    private final CalculatedStatisticService calculatedStatisticService;
     private final DataScrapperService scrapperService;
     private final StatisticRepos statisticRepos;
 
-    public CurrentStatisticService(DataScrapperService scrapperService, StatisticRepos statisticRepos) {
+    public CurrentStatisticService(CalculatedStatisticService calculatedStatisticService,
+                                   DataScrapperService scrapperService, StatisticRepos statisticRepos) {
+        this.calculatedStatisticService = calculatedStatisticService;
         this.scrapperService = scrapperService;
         this.statisticRepos = statisticRepos;
     }
 
-    public List<Statistic> getGraphicData(OnlyFansModel model, DateUnit unit, int count){
+    public OnlyFansModelCalculatedStatisticDto getCurrentWithCalculated(OnlyFansModel model, Date start){
+        var statistic = model.getStatistics();
+
+        var historical = statistic.stream()
+                .filter(s -> s.getMoment().after(start) && s.isGlobalPoint())
+                .collect(Collectors.toList());
+
+        var calculated = calculatedStatisticService.calculate(historical);
+
+        var current = statistic.size() > 0? statistic.get(statistic.size() - 1) : null;
+
+        return OnlyFansModelCalculatedStatisticDto.builder()
+                .model(model)
+                .historicalCalculated(calculated)
+                .current(current)
+                .build();
+    }
+
+    public List<CalculatedStatisticDto> getCalculatedGraphicData(OnlyFansModel model, DateUnit unit, int count){
         List<Statistic> graphic = new ArrayList<>();
         switch (unit){
             case MONTH:
@@ -34,19 +59,19 @@ public class CurrentStatisticService {
                 break;
         }
 
-        return graphic;
+        return calculatedStatisticService.calculate(graphic);
     }
 
-    public OnlyFansModelGraphicDto getWithGraphic(OnlyFansModel model, DateUnit unit, int count)
+    public OnlyFansModelGraphicDto getWithCalculatedGraphic(OnlyFansModel model, DateUnit unit, int count)
             throws CannotGetStatisticException {
         var current = scrapperService.getStatistic(model.getUrl());
 
-        var graphic = getGraphicData(model, unit, count);
+        var calculated = getCalculatedGraphicData(model, unit, count + 1);
 
         return OnlyFansModelGraphicDto.builder()
                 .model(model)
                 .current(current)
-                .graphical(graphic)
+                .graphical(calculated)
                 .build();
     }
 

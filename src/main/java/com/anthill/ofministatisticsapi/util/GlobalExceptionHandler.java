@@ -1,6 +1,7 @@
 package com.anthill.ofministatisticsapi.util;
 
 import com.anthill.ofministatisticsapi.exceptions.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.util.Arrays;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -98,5 +101,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> telegramChatNotExists(TelegramChatNotExists ex){
 
         return new ResponseEntity<>("Telegram chat with our bot not exists :(", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(JsonMappingException.class)
+    public ResponseEntity<String> jsonMappingException(JsonMappingException ex){
+
+        return new ResponseEntity<>(ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
     }
 }
