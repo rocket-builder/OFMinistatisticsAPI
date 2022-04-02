@@ -1,15 +1,10 @@
 package com.anthill.ofministatisticsapi.repos;
 
-import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
-import com.anthill.ofministatisticsapi.enums.DateUnit;
 import com.anthill.ofministatisticsapi.interfaces.CommonRepository;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +33,7 @@ public interface StatisticRepos extends CommonRepository<Statistic> {
             "order by s.id desc", nativeQuery = true)
     List<Statistic> findLastGlobalPointsByModelAndMonthCount(long modelId, int month);
 
-    @Query(value = "select * from statistic s where s.model_id=?1 and s.moment = CURDATE() order by id asc limit 1",
+    @Query(value = "select * from statistic s where s.model_id=?1 and DATE(s.moment) = CURDATE() order by id asc limit 1",
             nativeQuery = true)
     Optional<Statistic> findTodayFirstByModel(long modelId);
 
