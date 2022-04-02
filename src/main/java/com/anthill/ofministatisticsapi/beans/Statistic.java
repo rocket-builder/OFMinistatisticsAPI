@@ -42,6 +42,13 @@ public class Statistic extends AbstractEntity {
         return result;
     }
 
+    public static Statistic zeroize(Statistic statistic){
+        statistic.setSubscribersCount(0);
+        statistic.setLikesCount(0);
+
+        return statistic;
+    }
+
     public boolean isZero(){
         return subscribersCount == 0 && likesCount == 0;
     }
