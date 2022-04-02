@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 @Entity
 @JsonIgnoreProperties({"userAssoc", "statistics", "users", "alertUsers"})
 public class OnlyFansModel extends AbstractEntity {
-    private String name;
-    private String url;
-    private String avatarUrl;
+    protected String name;
+    protected String url;
+    protected String avatarUrl;
 
     @JsonFormat(pattern="yyyy-MM-dd")
-    private Date created;
+    protected Date created;
 
     @PrePersist
     protected void onCreate() {
@@ -31,10 +31,10 @@ public class OnlyFansModel extends AbstractEntity {
     }
 
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL)
-    private List<UserOnlyFansModel> userAssoc = new ArrayList<>();
+    protected List<UserOnlyFansModel> userAssoc = new ArrayList<>();
 
     @OneToMany(mappedBy = "model", cascade = CascadeType.DETACH, orphanRemoval = true)
-    private List<Statistic> statistics = new ArrayList<>();
+    protected List<Statistic> statistics = new ArrayList<>();
 
     public void addUser(User user){
         var assoc = UserOnlyFansModel.builder()
