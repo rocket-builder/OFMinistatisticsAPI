@@ -36,6 +36,8 @@ public class Statistic extends AbstractEntity {
 
         result.setSubscribersCount(s1.getSubscribersCount() - s2.getSubscribersCount());
         result.setLikesCount(s1.getLikesCount() - s2.getLikesCount());
+        result.setPhotosCount(s1.getPhotosCount() - s2.getPhotosCount());
+        result.setVideosCount(s1.getVideosCount() - s2.getVideosCount());
 
         result.setMoment(s1.getMoment());
 
