@@ -89,8 +89,12 @@ public class CurrentStatisticService {
                     .map(lastGlobalPoint ->
                             Statistic.subtract(update, lastGlobalPoint))
                     .orElseGet(() -> {
-                       var todayFirst = statisticRepos.findTodayFirstByModel(model.getId());
-                       return Statistic.subtract(update, todayFirst.get());
+                       var todayFirstOptional = statisticRepos.findTodayFirstByModel(model.getId());
+                       return todayFirstOptional
+                               .map(statistic ->
+                                       Statistic.subtract(update, statistic))
+                               .orElseGet(() ->
+                                       Statistic.zeroize(update));
                     });
 
             var lastYesterdayGlobalPointOptional =
@@ -127,7 +131,7 @@ public class CurrentStatisticService {
             return Statistic.subtract(last, first);
         } else if (statistics.size() == 1){
 
-            return statistics.get(0);
+            return Statistic.zeroize(statistics.get(0));
         } else {
 
             return new Statistic();
