@@ -13,16 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class StatisticController extends AbstractController<Statistic, StatisticRepos> {
 
-    private final DataScrapperService scrapperService;
-
-    protected StatisticController(StatisticRepos repos, DataScrapperService scrapperService) {
+    protected StatisticController(StatisticRepos repos) {
         super(repos);
-        this.scrapperService = scrapperService;
-    }
-
-    @GetMapping("/now")
-    public Statistic getStatisticsNow(@RequestParam String url) throws CannotGetStatisticException {
-
-        return scrapperService.getStatistic(url);
     }
 }

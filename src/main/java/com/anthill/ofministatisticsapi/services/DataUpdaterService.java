@@ -80,12 +80,9 @@ public class DataUpdaterService {
                         });
 
                 if(!difference.isZero()){
-                    if(model.isNeedAlerts()){
-                        telegramService.sendUpdate(
-                                new TelegramUpdateDto(model.getUser().getTelegramId(), model, difference));
-                    } else {
-                        log.info("Telegram alerts disabled for model id " + model.getId());
-                    }
+                    model.getAlertUsers().forEach(user ->
+                            telegramService.sendUpdate(
+                                    new TelegramUpdateDto(user.getTelegramId(), model, difference)));
 
                     statisticRepos.save(update);
                     log.info(model.getName() + " statistic successfully updated!");
@@ -96,20 +93,24 @@ public class DataUpdaterService {
             catch (CannotGetStatisticException ex){
                 ex.printStackTrace();
 
-                var message = TelegramMessageDto.builder()
-                        .message("Cannot get data for model " + model.getName() + " :(")
-                        .telegramId(model.getUser().getTelegramId())
-                        .build();
-                telegramService.sendMessage(message);
+                model.getUsers().forEach(user -> {
+                    var message = TelegramMessageDto.builder()
+                            .message("Cannot get data for model " + model.getName() + " :(")
+                            .telegramId(user.getTelegramId())
+                            .build();
+                    telegramService.sendMessage(message);
+                });
             }
             catch (Exception ex){
                 ex.printStackTrace();
 
-                var message = TelegramMessageDto.builder()
-                        .message("Something awful happened while processing the model " + model.getName() + " :(")
-                        .telegramId(model.getUser().getTelegramId())
-                        .build();
-                telegramService.sendMessage(message);
+                model.getUsers().forEach(user -> {
+                    var message = TelegramMessageDto.builder()
+                            .message("Something awful happened while processing the model " + model.getName() + " :(")
+                            .telegramId(user.getTelegramId())
+                            .build();
+                    telegramService.sendMessage(message);
+                });
             }
         });
         
