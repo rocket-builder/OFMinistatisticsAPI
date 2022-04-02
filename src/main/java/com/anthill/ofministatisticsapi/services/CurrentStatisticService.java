@@ -93,8 +93,7 @@ public class CurrentStatisticService {
                        return todayFirstOptional
                                .map(statistic ->
                                        Statistic.subtract(update, statistic))
-                               .orElseGet(() ->
-                                       Statistic.zeroize(update));
+                               .orElseGet(Statistic::new);
                     });
 
             var lastYesterdayGlobalPointOptional =
@@ -129,9 +128,6 @@ public class CurrentStatisticService {
             var last = statistics.get(statistics.size()-1);
 
             return Statistic.subtract(last, first);
-        } else if (statistics.size() == 1){
-
-            return Statistic.zeroize(statistics.get(0));
         } else {
 
             return new Statistic();
