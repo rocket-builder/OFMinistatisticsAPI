@@ -7,6 +7,9 @@ import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -61,8 +64,10 @@ public class DataUpdaterService {
         log.info("start update all models statistics at "+ LocalDateTime.now());
 
         var models = modelRepos.findAll();
+
+
         models.forEach(model -> {
-            try{
+            try {
                 var update = scrapperService.getStatistic(model.getUrl());
                 update.setModel(model);
 
