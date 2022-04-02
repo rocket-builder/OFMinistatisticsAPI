@@ -14,5 +14,5 @@ public interface UserOnlyFansModelRepos extends CrudRepository<UserOnlyFansModel
     Optional<UserOnlyFansModel> findFirstByModel_IdAndUser_TelegramId(long modelId, long telegramId);
 
     @Transactional
-    void deleteByModel_IdAndUser_Id(long modelId, long userId);
+    void deleteByModel_IdAndUser_TelegramId(long modelId, long telegramId);
 }

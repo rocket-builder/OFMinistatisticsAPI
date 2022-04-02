@@ -196,9 +196,10 @@ public class UserController extends AbstractController<User, UserRepos> {
         return userOnlyFansModelRepos.save(assoc).getModel();
     }
 
-    @DeleteMapping("/{userId}/model/{modelId}")
-    public ResponseEntity<String> deleteModelFromUser(@PathVariable("userId") long userId, @PathVariable("modelId") long modelId){
-        userOnlyFansModelRepos.deleteByModel_IdAndUser_Id(modelId, userId);
+    @DeleteMapping("/{telegramId}/model/{modelId}")
+    public ResponseEntity<String> deleteModelFromUser(@PathVariable("telegramId") long telegramId,
+                                                      @PathVariable("modelId") long modelId){
+        userOnlyFansModelRepos.deleteByModel_IdAndUser_TelegramId(modelId, telegramId);
 
         return new ResponseEntity<>("Successfully deleted!", HttpStatus.OK);
     }
