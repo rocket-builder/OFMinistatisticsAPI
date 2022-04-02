@@ -2,6 +2,7 @@ package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.User;
+import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelAlertedDto;
 import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelCalculatedStatisticDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CredentialsDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CurrentStatisticDto;
@@ -163,11 +164,11 @@ public class UserController extends AbstractController<User, UserRepos> {
     }
 
     @GetMapping("/{telegramId}/models")
-    public List<OnlyFansModel> getUserModels(@PathVariable("telegramId") long telegramId) throws UserNotFoundedException {
+    public List<OnlyFansModelAlertedDto> getUserModels(@PathVariable("telegramId") long telegramId) throws UserNotFoundedException {
         var user = repos.findByTelegramId(telegramId)
                 .orElseThrow(UserNotFoundedException::new);
 
-        return user.getModels();
+        return user.getModelsAlerted();
     }
 
     @GetMapping("/{id}/modelsStatistic")

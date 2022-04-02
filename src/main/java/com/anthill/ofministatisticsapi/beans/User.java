@@ -1,12 +1,14 @@
 package com.anthill.ofministatisticsapi.beans;
 
 
+import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelAlertedDto;
 import com.anthill.ofministatisticsapi.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -33,6 +35,18 @@ public class User extends AbstractEntity {
                 .map(UserOnlyFansModel::getModel)
                 .collect(Collectors.toList());
     }
+    public List<OnlyFansModelAlertedDto> getModelsAlerted(){
+        return modelsAssoc.stream()
+                .map(assoc -> {
+                    var model = new OnlyFansModelAlertedDto();
+                    BeanUtils.copyProperties(assoc.getModel(), model);
+                    
+                    model.setNeedAlerts(assoc.isNeedAlerts());
+                    return model;
+                })
+                .collect(Collectors.toList());
+    }
+
     public void setModels(List<OnlyFansModel> models){
         this.modelsAssoc = models.stream()
                 .map(model ->
