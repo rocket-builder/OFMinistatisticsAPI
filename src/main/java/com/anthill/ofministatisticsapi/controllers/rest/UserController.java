@@ -207,7 +207,7 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     @DeleteMapping("/{telegramId}/models/list")
     public ResponseEntity<String> deleteModelFromUser(@PathVariable("telegramId") long telegramId,
-                                                      @RequestBody Iterable<Long> modelIds){
+                                                      @RequestBody List<Long> modelIds){
         modelIds.forEach(modelId ->
                 userOnlyFansModelRepos.deleteByModel_IdAndUser_TelegramId(modelId, telegramId));
 
