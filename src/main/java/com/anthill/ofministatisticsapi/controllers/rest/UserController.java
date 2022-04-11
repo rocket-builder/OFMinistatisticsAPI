@@ -134,11 +134,11 @@ public class UserController extends AbstractController<User, UserRepos> {
 
     @PostMapping("/{telegramId}/model")
     public OnlyFansModel addModelOnUser(@PathVariable("telegramId") long telegramId, String url)
-            throws UserNotFoundedException, CannotGetStatisticException, ResourceAlreadyExists {
+            throws UserNotFoundedException, CannotGetStatisticException, ResourceAlreadyExists, ResourceNotFoundedException {
         var user = repos.findByTelegramId(telegramId)
                 .orElseThrow(UserNotFoundedException::new);
 
-        var modelOptional = modelRepos.findOldestByUrl(url);
+        var modelOptional = modelRepos.findByUrl(url);
 
         OnlyFansModel model;
         if(modelOptional.isPresent()){

@@ -34,8 +34,8 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
     public OnlyFansModelGraphicDto searchModel(@RequestParam String url,
                                                @RequestParam(defaultValue = "MONTH") DateUnit unit,
                                                @RequestParam(defaultValue = "6") int count)
-            throws CannotGetStatisticException {
-        var modelOptional = repos.findOldestByUrl(url);
+            throws CannotGetStatisticException, ResourceNotFoundedException {
+        var modelOptional = repos.findByUrl(url);
 
         OnlyFansModelGraphicDto dto;
         if (modelOptional.isPresent()){

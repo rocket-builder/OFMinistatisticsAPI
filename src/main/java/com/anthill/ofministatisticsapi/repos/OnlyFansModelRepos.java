@@ -10,6 +10,5 @@ import java.util.Optional;
 @Repository
 public interface OnlyFansModelRepos extends CommonRepository<OnlyFansModel> {
 
-    @Query(value = "select * from only_fans_model m where m.url=?1 order by m.id asc limit 1", nativeQuery = true)
-    Optional<OnlyFansModel> findOldestByUrl(String url);
+    Optional<OnlyFansModel> findByUrl(String url);
 }

@@ -5,6 +5,7 @@ import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelItemDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.ScrapperStatisticDto;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
+import com.anthill.ofministatisticsapi.exceptions.ResourceNotFoundedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -21,12 +22,14 @@ public class DataScrapperService {
     @Value("${ofministatistics.app.url}")
     private String baseUrl;
 
-    public Statistic getStatistic(String url) throws CannotGetStatisticException{
+    public Statistic getStatistic(String url)
+            throws CannotGetStatisticException, ResourceNotFoundedException {
         var dto = getStatisticsDto(url);
         return dtoToStatistic(dto);
     }
 
-    public OnlyFansModelItemDto getModelWithStatistic(String url) throws CannotGetStatisticException{
+    public OnlyFansModelItemDto getModelWithStatistic(String url)
+            throws CannotGetStatisticException, ResourceNotFoundedException {
         var dto = getStatisticsDto(url);
 
         var statistic = dtoToStatistic(dto);
@@ -43,7 +46,8 @@ public class DataScrapperService {
                 .statistic(statistic).build();
     }
 
-    public ScrapperStatisticDto getStatisticsDto(String url) throws CannotGetStatisticException {
+    public ScrapperStatisticDto getStatisticsDto(String url)
+            throws CannotGetStatisticException, ResourceNotFoundedException {
 
         try(var httpClient = new DefaultHttpClient()){
             var requestUrl = baseUrl + "/ModelStatistics?url=" + url;
@@ -53,6 +57,9 @@ public class DataScrapperService {
 
             var response = httpClient.execute(request);
 
+            if (response.getStatusLine().getStatusCode() == 404){
+                throw new ResourceNotFoundedException(url);
+            }
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
                         + response.getStatusLine().getStatusCode());
