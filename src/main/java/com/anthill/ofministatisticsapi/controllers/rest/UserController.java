@@ -178,7 +178,7 @@ public class UserController extends AbstractController<User, UserRepos> {
         var user = repos.findById(id)
                 .orElseThrow(UserNotFoundedException::new);
 
-        return user.getModels().stream()
+        return user.getModelsAlerted().stream()
                 .map(model ->
                         currentStatisticService.getCurrentWithCalculated(model, start))
                 .collect(Collectors.toList());
