@@ -5,7 +5,7 @@ import com.anthill.ofministatisticsapi.beans.dto.TelegramMessageDto;
 import com.anthill.ofministatisticsapi.exceptions.CannotCheckExistsChatException;
 import com.anthill.ofministatisticsapi.exceptions.UserNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
-import com.anthill.ofministatisticsapi.services.MessageGenerator;
+import com.anthill.ofministatisticsapi.services.MessageGeneratorService;
 import com.anthill.ofministatisticsapi.services.TelegramService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
@@ -17,13 +17,13 @@ public class TelegramController {
 
     private final UserRepos userRepos;
     private final TelegramService telegramService;
-    private final MessageGenerator messageGenerator;
+    private final MessageGeneratorService messageGeneratorService;
 
     public TelegramController(UserRepos userRepos, TelegramService telegramService,
-                              MessageGenerator messageGenerator) {
+                              MessageGeneratorService messageGeneratorService) {
         this.userRepos = userRepos;
         this.telegramService = telegramService;
-        this.messageGenerator = messageGenerator;
+        this.messageGeneratorService = messageGeneratorService;
     }
 
     @PostMapping("/send/{telegramId}/OnlyFansModelAdded")
@@ -32,8 +32,8 @@ public class TelegramController {
         var user = userRepos.findByTelegramId(telegramId)
                 .orElseThrow(UserNotFoundedException::new);
 
-        var message = messageGenerator
-                .GetOnlyFansModelAdded(user.getTelegramId(), model);
+        var message = messageGeneratorService
+                .getOnlyFansModelAdded(user.getTelegramId(), model);
 
         telegramService.sendMessage(message);
         return message;

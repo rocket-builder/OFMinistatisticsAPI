@@ -1,6 +1,7 @@
 package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
+import com.anthill.ofministatisticsapi.beans.PasswordResetToken;
 import com.anthill.ofministatisticsapi.beans.User;
 import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelAlertedDto;
 import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelCalculatedStatisticDto;
@@ -9,11 +10,13 @@ import com.anthill.ofministatisticsapi.beans.dto.statistic.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.exceptions.*;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
+import com.anthill.ofministatisticsapi.repos.PasswordResetTokenRepos;
 import com.anthill.ofministatisticsapi.repos.UserOnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.UserRepos;
 import com.anthill.ofministatisticsapi.security.MD5;
 import com.anthill.ofministatisticsapi.services.CurrentStatisticService;
 import com.anthill.ofministatisticsapi.services.DataScrapperService;
+import com.anthill.ofministatisticsapi.services.MessageGeneratorService;
 import com.anthill.ofministatisticsapi.services.TelegramService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,7 +36,9 @@ public class UserController extends AbstractController<User, UserRepos> {
     private final TelegramService telegramService;
     private final DataScrapperService scrapperService;
     private final CurrentStatisticService currentStatisticService;
+    private final MessageGeneratorService messageGeneratorService;
 
+    private final PasswordResetTokenRepos resetTokenRepos;
     private final OnlyFansModelRepos modelRepos;
     private final UserOnlyFansModelRepos userOnlyFansModelRepos;
 
@@ -41,12 +46,15 @@ public class UserController extends AbstractController<User, UserRepos> {
                              OnlyFansModelRepos modelRepos,
                              DataScrapperService scrapperService,
                              CurrentStatisticService currentStatisticService,
+                             MessageGeneratorService messageGeneratorService, PasswordResetTokenRepos resetTokenRepos,
                              UserOnlyFansModelRepos userOnlyFansModelRepos) {
         super(repos);
         this.telegramService = telegramService;
         this.modelRepos = modelRepos;
         this.scrapperService = scrapperService;
         this.currentStatisticService = currentStatisticService;
+        this.messageGeneratorService = messageGeneratorService;
+        this.resetTokenRepos = resetTokenRepos;
         this.userOnlyFansModelRepos = userOnlyFansModelRepos;
     }
 
@@ -65,7 +73,8 @@ public class UserController extends AbstractController<User, UserRepos> {
     }
 
     @GetMapping("/{telegramId}/statistic")
-    public List<CurrentStatisticDto> getCurrentStatistic(@PathVariable("telegramId") long telegramId) throws UserNotFoundedException {
+    public List<CurrentStatisticDto> getCurrentStatistic(@PathVariable("telegramId") long telegramId)
+            throws UserNotFoundedException {
         var user = repos.findByTelegramId(telegramId)
                 .orElseThrow(UserNotFoundedException::new);
 
@@ -108,6 +117,19 @@ public class UserController extends AbstractController<User, UserRepos> {
     @PostMapping("/signOut")
     public Object signOut(){
         return null;
+    }
+
+    @PostMapping("/{login}/createPasswordReset")
+    public PasswordResetToken createPasswordReset(@PathVariable("login") String login)
+            throws UserNotFoundedException {
+        var user = repos.findByLogin(login)
+                .orElseThrow(UserNotFoundedException::new);
+        var token = resetTokenRepos.save(new PasswordResetToken(user));
+
+        telegramService.sendMessage(
+                messageGeneratorService.getPasswordReset(user.getTelegramId(), token));
+
+        return token;
     }
 
     @PostMapping("/{telegramId}/model")
