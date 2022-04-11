@@ -8,6 +8,7 @@ import com.anthill.ofministatisticsapi.beans.dto.statistic.CalculatedStatisticDt
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.enums.DateUnit;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
+import com.anthill.ofministatisticsapi.exceptions.ResourceNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +64,7 @@ public class CurrentStatisticService {
     }
 
     public OnlyFansModelGraphicDto getWithCalculatedGraphic(OnlyFansModel model, DateUnit unit, int count)
-            throws CannotGetStatisticException {
+            throws CannotGetStatisticException, ResourceNotFoundedException {
         var current = scrapperService.getStatistic(model.getUrl());
 
         var calculated = getCalculatedGraphicData(model, unit, count + 1);
@@ -75,12 +76,19 @@ public class CurrentStatisticService {
                 .build();
     }
 
-    public CurrentStatisticDto updateByModel(OnlyFansModel model){
+    public CurrentStatisticDto updateByModel(OnlyFansModel model) {
         try{
-            var update = scrapperService.getStatistic(model.getUrl());
+            Statistic updateOrLast = null;
+            try {
+                updateOrLast = scrapperService.getStatistic(model.getUrl());
 
-            update.setModel(model);
-            statisticRepos.save(update);
+                updateOrLast.setModel(model);
+                statisticRepos.save(updateOrLast);
+            } catch (ResourceNotFoundedException ex){
+                updateOrLast = statisticRepos.findLastByModel(model.getId())
+                        .orElseGet(Statistic::new);
+            }
+            var update = updateOrLast;
 
             var lastGlobalPointOptional =
                     statisticRepos.findLastGlobalPointByModel(model.getId());
@@ -114,7 +122,7 @@ public class CurrentStatisticService {
             var month = subtractLastFromFirst(
                     statisticRepos.findLastMonthByModel(model.getId()));
 
-            return new CurrentStatisticDto(model.getName(), update, today, yesterday, week, month);
+            return new CurrentStatisticDto(model.getName(), updateOrLast, today, yesterday, week, month);
         } catch (CannotGetStatisticException ex){
             ex.printStackTrace();
 

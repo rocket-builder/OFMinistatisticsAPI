@@ -4,6 +4,7 @@ import com.anthill.ofministatisticsapi.beans.Statistic;
 import com.anthill.ofministatisticsapi.beans.dto.TelegramMessageDto;
 import com.anthill.ofministatisticsapi.beans.dto.TelegramUpdateDto;
 import com.anthill.ofministatisticsapi.exceptions.CannotGetStatisticException;
+import com.anthill.ofministatisticsapi.exceptions.ResourceNotFoundedException;
 import com.anthill.ofministatisticsapi.repos.OnlyFansModelRepos;
 import com.anthill.ofministatisticsapi.repos.StatisticRepos;
 import lombok.extern.slf4j.Slf4j;
@@ -52,8 +53,8 @@ public class DataUpdaterService {
                 modelRepos.save(model);
 
                 log.info("Global point statistic for " + model.getName() + " successfully saved!");
-            } catch (CannotGetStatisticException | RuntimeException ex){
-                log.error("Cannot update global statistic for " + model.getName());
+            } catch (CannotGetStatisticException | RuntimeException | ResourceNotFoundedException ex){
+                log.error("Cannot update global statistic for " + model.getName() + " because " + ex.getMessage());
                 ex.printStackTrace();
             }
         });
@@ -64,7 +65,6 @@ public class DataUpdaterService {
         log.info("start update all models statistics at "+ LocalDateTime.now());
 
         var models = modelRepos.findAll();
-
 
         models.forEach(model -> {
             try {
@@ -101,6 +101,17 @@ public class DataUpdaterService {
                 model.getUsers().forEach(user -> {
                     var message = TelegramMessageDto.builder()
                             .message("Cannot get data for model " + model.getName() + " :(")
+                            .telegramId(user.getTelegramId())
+                            .build();
+                    telegramService.sendMessage(message);
+                });
+            }
+            catch (ResourceNotFoundedException ex){
+                ex.printStackTrace();
+
+                model.getUsers().forEach(user -> {
+                    var message = TelegramMessageDto.builder()
+                            .message("Model " + model.getName() + " already not exists on onlyfans :(")
                             .telegramId(user.getTelegramId())
                             .build();
                     telegramService.sendMessage(message);
