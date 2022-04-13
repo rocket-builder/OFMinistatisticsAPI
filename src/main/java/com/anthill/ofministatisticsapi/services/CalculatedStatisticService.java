@@ -15,7 +15,7 @@ public class CalculatedStatisticService {
         return StreamEx.of(historical)
                 .pairMap((p, n) ->
                         CalculatedStatisticDto.builder()
-                                .calculated(Statistic.subtract(n, p))
+                                .calculated(Statistic.subtract(p, n))
                                 .statistic(n)
                                 .build())
                 .collect(Collectors.toList());
