@@ -16,7 +16,8 @@ public class CorsConfiguration implements WebMvcConfigurer {
                         "https://of-mini-statistic-app-dev.herokuapp.com",
                         "https://of-mini-statistic-react-app.herokuapp.com",
                         "https://of-mini-statistics-app.herokuapp.com",
-                        "http://localhost:3000")
+                        "http://localhost:3000",
+                        "http://127.0.0.1:3000")
                 .allowCredentials(true)
                 .allowedMethods("POST", "GET", "PUT", "DELETE")
                 .allowedHeaders("*");
