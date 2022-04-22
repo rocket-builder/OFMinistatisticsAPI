@@ -4,7 +4,7 @@ import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.PasswordResetToken;
 import com.anthill.ofministatisticsapi.beans.User;
 import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelAlertedDto;
-import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelCalculatedStatisticDto;
+import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelCalculatedDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CredentialsDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
@@ -194,8 +194,8 @@ public class UserController extends AbstractController<User, UserRepos> {
     }
 
     @GetMapping("/{id}/modelsStatistic")
-    public List<OnlyFansModelCalculatedStatisticDto> getModelsStatistic(@PathVariable("id") long id,
-                                                                        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start)
+    public List<OnlyFansModelCalculatedDto> getModelsStatistic(@PathVariable("id") long id,
+                                                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start)
             throws UserNotFoundedException {
         var user = repos.findById(id)
                 .orElseThrow(UserNotFoundedException::new);

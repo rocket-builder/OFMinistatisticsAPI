@@ -12,12 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
-public class OnlyFansModelGraphicDto {
+public class OnlyFansModelCalculatedDto {
 
     private OnlyFansModel model;
 
-    @JsonProperty("statistic")
     private Statistic current;
 
-    private List<CalculatedStatisticDto> graphical;
+    private List<CalculatedStatisticDto> calculatedStatistics;
 }

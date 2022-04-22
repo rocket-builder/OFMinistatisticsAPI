@@ -1,7 +1,7 @@
 package com.anthill.ofministatisticsapi.controllers.rest;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
-import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelGraphicDto;
+import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelCalculatedDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CalculatedStatisticDto;
 import com.anthill.ofministatisticsapi.controllers.AbstractController;
 import com.anthill.ofministatisticsapi.enums.DateUnit;
@@ -24,28 +24,29 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
     private final DataScrapperService scrapperService;
     private final CurrentStatisticService statisticService;
 
-    protected OnlyFansModelController(OnlyFansModelRepos repos, DataScrapperService scrapperService, CurrentStatisticService statisticService) {
+    protected OnlyFansModelController(OnlyFansModelRepos repos, DataScrapperService scrapperService,
+                                      CurrentStatisticService statisticService) {
         super(repos);
         this.scrapperService = scrapperService;
         this.statisticService = statisticService;
     }
 
     @GetMapping("/search/filter")
-    public OnlyFansModelGraphicDto searchModel(@RequestParam String url,
-                                               @RequestParam(defaultValue = "MONTH") DateUnit unit,
-                                               @RequestParam(defaultValue = "6") int count)
+    public OnlyFansModelCalculatedDto searchModel(@RequestParam String url,
+                                                  @RequestParam(defaultValue = "MONTH") DateUnit unit,
+                                                  @RequestParam(defaultValue = "6") int count)
             throws CannotGetStatisticException, ResourceNotFoundedException {
         var modelOptional = repos.findByUrl(url);
 
-        OnlyFansModelGraphicDto dto;
+        OnlyFansModelCalculatedDto dto;
         if (modelOptional.isPresent()){
-            dto = statisticService.getWithCalculatedGraphic(modelOptional.get(), unit, count);
+            dto = statisticService.getCalculatedStatistic(modelOptional.get(), unit, count);
         } else {
             var modelWithStatistic = scrapperService.getModelWithStatistic(url);
-            dto = OnlyFansModelGraphicDto.builder()
+            dto = OnlyFansModelCalculatedDto.builder()
                     .model(modelWithStatistic.getModel())
                     .current(modelWithStatistic.getStatistic())
-                    .graphical(new ArrayList<>())
+                    .calculatedStatistics(new ArrayList<>())
                     .build();
         }
 
@@ -60,6 +61,6 @@ public class OnlyFansModelController extends AbstractController<OnlyFansModel, O
         var model = repos.findById(id)
                 .orElseThrow(ResourceNotFoundedException::new);
 
-        return statisticService.getCalculatedGraphicData(model, unit, count);
+        return statisticService.getCalculatedData(model, unit, count);
     }
 }

@@ -2,8 +2,7 @@ package com.anthill.ofministatisticsapi.services;
 
 import com.anthill.ofministatisticsapi.beans.OnlyFansModel;
 import com.anthill.ofministatisticsapi.beans.Statistic;
-import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelCalculatedStatisticDto;
-import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelGraphicDto;
+import com.anthill.ofministatisticsapi.beans.dto.onlyFansModel.OnlyFansModelCalculatedDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CalculatedStatisticDto;
 import com.anthill.ofministatisticsapi.beans.dto.statistic.CurrentStatisticDto;
 import com.anthill.ofministatisticsapi.enums.DateUnit;
@@ -31,7 +30,7 @@ public class CurrentStatisticService {
         this.statisticRepos = statisticRepos;
     }
 
-    public OnlyFansModelCalculatedStatisticDto getCurrentWithCalculated(OnlyFansModel model, Date start){
+    public OnlyFansModelCalculatedDto getCurrentWithCalculated(OnlyFansModel model, Date start){
         var statistic = model.getStatistics();
 
         var historical = statistic.stream()
@@ -42,37 +41,37 @@ public class CurrentStatisticService {
 
         var current = statistic.size() > 0? statistic.get(statistic.size() - 1) : null;
 
-        return OnlyFansModelCalculatedStatisticDto.builder()
+        return OnlyFansModelCalculatedDto.builder()
                 .model(model)
-                .historicalCalculated(calculated)
+                .calculatedStatistics(calculated)
                 .current(current)
                 .build();
     }
 
-    public List<CalculatedStatisticDto> getCalculatedGraphicData(OnlyFansModel model, DateUnit unit, int count){
-        List<Statistic> graphic = new ArrayList<>();
+    public List<CalculatedStatisticDto> getCalculatedData(OnlyFansModel model, DateUnit unit, int count){
+        List<Statistic> globalPoints = new ArrayList<>();
         switch (unit){
             case MONTH:
-                graphic = statisticRepos.findLastGlobalPointsByModelAndMonthCount(model.getId(), count);
+                globalPoints = statisticRepos.findLastGlobalPointsByModelAndMonthCount(model.getId(), count);
                 break;
             case DAY:
-                graphic = statisticRepos.findLastGlobalPointsByModelAndDaysCount(model.getId(), count);
+                globalPoints = statisticRepos.findLastGlobalPointsByModelAndDaysCount(model.getId(), count);
                 break;
         }
 
-        return calculatedStatisticService.calculate(graphic);
+        return calculatedStatisticService.calculate(globalPoints);
     }
 
-    public OnlyFansModelGraphicDto getWithCalculatedGraphic(OnlyFansModel model, DateUnit unit, int count)
+    public OnlyFansModelCalculatedDto getCalculatedStatistic(OnlyFansModel model, DateUnit unit, int count)
             throws CannotGetStatisticException, ResourceNotFoundedException {
         var current = scrapperService.getStatistic(model.getUrl());
 
-        var calculated = getCalculatedGraphicData(model, unit, count + 1);
+        var calculated = getCalculatedData(model, unit, count + 1);
 
-        return OnlyFansModelGraphicDto.builder()
+        return OnlyFansModelCalculatedDto.builder()
                 .model(model)
                 .current(current)
-                .graphical(calculated)
+                .calculatedStatistics(calculated)
                 .build();
     }
 
