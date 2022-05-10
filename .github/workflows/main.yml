@@ -12,6 +12,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
-          heroku_api_key: "8a59e464-71e4-4485-8d3f-d62781727444"
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "of-mini-statistic-api"
           heroku_email: "ralfbodiner@gmail.com"
