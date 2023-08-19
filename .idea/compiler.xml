@@ -10,9 +10,6 @@
         <module name="of-mini-statistics-api" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="of-mini-statistics-api" target="11" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
